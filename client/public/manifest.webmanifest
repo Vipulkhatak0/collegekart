@@ -1,0 +1,10 @@
+{
+  "name": "CollegeKart",
+  "short_name": "CollegeKart",
+  "description": "Buy, sell, and trade with students on your campus.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B5FE3",
+  "icons": []
+}

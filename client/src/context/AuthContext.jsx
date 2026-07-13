@@ -53,6 +53,19 @@ export function AuthProvider({ children }) {
     return data;
   }, [persistSession]);
 
+  // Step 1 of password reset: sends an OTP email, returns { userId }
+  const forgotPassword = useCallback(async (email) => {
+    const { data } = await api.post('/auth/forgot-password', { email });
+    return data; // { message, userId }
+  }, []);
+
+  // Step 2 of password reset: verifies the OTP, sets the new password, logs the user in
+  const resetPassword = useCallback(async ({ userId, otp, newPassword }) => {
+    const { data } = await api.post('/auth/reset-password', { userId, otp, newPassword });
+    persistSession(data.token, data.user);
+    return data;
+  }, [persistSession]);
+
   const login = useCallback(async ({ email, password }) => {
     const { data } = await api.post('/auth/login', { email, password });
     persistSession(data.token, data.user);
@@ -76,7 +89,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated: !!user, register, verifyOtp, login, loginWithGoogle, updateUser, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, isAuthenticated: !!user, register, verifyOtp, login, loginWithGoogle, forgotPassword, resetPassword, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

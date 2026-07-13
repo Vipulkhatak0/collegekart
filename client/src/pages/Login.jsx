@@ -56,6 +56,10 @@ export default function Login() {
             />
           </div>
 
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-xs font-semibold text-primary-500">Forgot password?</Link>
+          </div>
+
           <button type="submit" disabled={submitting} className="btn-primary w-full disabled:opacity-60">
             {submitting ? 'Logging in...' : 'Login'}
           </button>

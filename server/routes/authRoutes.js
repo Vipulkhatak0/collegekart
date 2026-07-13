@@ -87,6 +87,59 @@ router.post('/verify-otp', otpLimiter, async (req, res) => {
   }
 });
 
+// @route POST /api/auth/forgot-password
+router.post('/forgot-password', otpLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required.' });
+
+    const user = await User.findOne({ email });
+    // Don't reveal whether the email exists — always respond the same way.
+    if (!user) {
+      return res.json({ message: 'If an account exists with this email, an OTP has been sent.' });
+    }
+
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+    await sendOTPEmail(email, otp);
+
+    res.json({ message: 'If an account exists with this email, an OTP has been sent.', userId: user._id });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to process request.', error: err.message });
+  }
+});
+
+// @route POST /api/auth/reset-password
+router.post('/reset-password', otpLimiter, async (req, res) => {
+  try {
+    const { userId, otp, newPassword } = req.body;
+    if (!userId || !otp || !newPassword) {
+      return res.status(400).json({ message: 'userId, otp and newPassword are required.' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+    }
+
+    const user = await User.findById(userId).select('+otp +otpExpires');
+    if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: 'Invalid or expired OTP.' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    user.isVerified = true;
+    await user.save();
+
+    const token = signToken(user._id);
+    res.json({ message: 'Password reset successfully.', token, user: toPublicUser(user) });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to reset password.', error: err.message });
+  }
+});
+
 // @route POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {

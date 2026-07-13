@@ -21,6 +21,7 @@ import HelpCenter from './pages/HelpCenter.jsx';
 import AdminPanel from './pages/AdminPanel.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/help" element={<HelpCenter />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Everything below requires the user to be logged in */}
           <Route element={<ProtectedRoute />}>

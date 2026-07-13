@@ -8,7 +8,7 @@ export const generateOTP = () =>
 export const sendOTPEmail = async (to, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'CollegeKart <onboarding@resend.dev>',
+      from: 'CollegeKart <noreply@collegekart.shop>',
       to,
       subject: 'CollegeKart Verification Code',
       html: `

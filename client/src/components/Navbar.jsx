@@ -187,31 +187,77 @@ export default function Navbar() {
       </div>
 
       <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.25 }}
-            className="fixed inset-y-0 right-0 z-50 w-72 bg-white dark:bg-surface-darkCard shadow-2xl lg:hidden"
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 p-4">
-              <span className="font-display font-bold">Menu</span>
-              <button onClick={() => setOpen(false)}><HiOutlineXMark className="h-6 w-6" /></button>
-            </div>
-            <div className="flex flex-col p-4 gap-1">
-              {[...navLinks, { to: '/wishlist', label: 'Wishlist' }, { to: '/chat', label: 'Chat' }, { to: '/dashboard', label: 'Dashboard' }].map((l) => (
-                <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5">
-                  {l.label}
-                </Link>
-              ))}
-              {user ? (
-                <button onClick={() => { setOpen(false); handleLogout(); }} className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">Logout</button>
-              ) : (
-                <Link to="/login" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5">Login</Link>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  {open && (
+    <>
+      {/* Background Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => setOpen(false)}
+        className="fixed inset-0 bg-black/50 z-[9998] lg:hidden"
+      />
+
+      {/* Mobile Menu */}
+      <motion.aside
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ duration: 0.25 }}
+        className="fixed top-0 right-0 h-screen w-72 bg-white dark:bg-slate-900 shadow-2xl z-[9999] overflow-y-auto lg:hidden"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 p-4">
+          <h2 className="text-lg font-bold">Menu</h2>
+
+          <button onClick={() => setOpen(false)}>
+            <HiOutlineXMark className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Links */}
+        <div className="flex flex-col gap-2 p-4">
+          {[
+            ...navLinks,
+            { to: "/wishlist", label: "Wishlist" },
+            { to: "/chat", label: "Chat" },
+            { to: "/dashboard", label: "Dashboard" },
+          ].map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          {user ? (
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleLogout();
+              }}
+              className="rounded-lg px-4 py-3 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      </motion.aside>
+    </>
+  )}
+</AnimatePresence>
+          
     </header>
   );
 }

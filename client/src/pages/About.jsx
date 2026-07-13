@@ -6,7 +6,7 @@ export default function About() {
       <span className="section-eyebrow">Our story</span>
       <h1 className="mt-2 font-display text-3xl font-bold">Built by students, for students</h1>
       <p className="mt-4 text-slate-500 dark:text-slate-400">
-        CollegeKart started with a simple frustration: every semester, students buy new textbooks, calculators, and furniture —
+        Cartic started with a simple frustration: every semester, students buy new textbooks, calculators, and furniture —
         then leave them behind when they move on. We built a marketplace where that value stays on campus, trusted and verified,
         student to student.
       </p>

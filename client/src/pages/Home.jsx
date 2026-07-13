@@ -6,8 +6,7 @@ import CategoryCard from '../components/CategoryCard.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import { categories } from '../data/mockData.js';
 import api from '../lib/api.js';
-import Lottie from 'lottie-react';
-import cartAnimation from '../assets/cart-animation.json';
+
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -22,9 +21,7 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-gradient opacity-20 blur-3xl" />
         <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-accent-500 opacity-10 blur-3xl" />
-        <div className="pointer-events-none absolute right-4 top-4 hidden w-56 opacity-90 lg:block xl:w-64">
-          <Lottie animationData={cartAnimation} loop={true} />
-        </div>
+       
         <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-14 pb-20 relative">
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>

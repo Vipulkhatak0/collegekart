@@ -1,24 +1,16 @@
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
 export const sendOTPEmail = async (to, otp) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
   try {
-    await transporter.sendMail({
-      from: `"CollegeKart" <${process.env.SMTP_USER}>`,
+    const { data, error } = await resend.emails.send({
+      from: 'CollegeKart <onboarding@resend.dev>',
       to,
-      subject: "CollegeKart Verification Code",
+      subject: 'CollegeKart Verification Code',
       html: `
         <h2>Your OTP is</h2>
         <h1>${otp}</h1>
@@ -26,7 +18,12 @@ export const sendOTPEmail = async (to, otp) => {
       `,
     });
 
-    console.log("✅ OTP Email Sent");
+    if (error) {
+      console.error('Resend error:', error);
+      throw new Error(error.message || 'Failed to send OTP email');
+    }
+
+    console.log('✅ OTP Email Sent via Resend:', data?.id);
   } catch (err) {
     console.error(err);
     throw err;

@@ -16,11 +16,26 @@ import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: process.env.CLIENT_URL || '*' } });
+const io = new Server(server, { cors: { origin: allowedOrigins } });
 
 app.set('io', io);
 
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+const allowedOrigins = [
+  'https://collegekart.shop',
+  'https://www.collegekart.shop',
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl, Postman, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

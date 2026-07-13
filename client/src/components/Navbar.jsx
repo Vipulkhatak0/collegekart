@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -21,6 +21,17 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+  if (open) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [open]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -37,7 +48,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/40 dark:border-white/10 bg-white/70 dark:bg-surface-dark/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/40 dark:border-white/10 bg-white/70 dark:bg-surface-dark/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-display text-lg font-bold text-white">C</span>
@@ -93,23 +104,77 @@ export default function Navbar() {
                   <HiOutlineUserCircle className="h-7 w-7" />
                 )}
               </button>
-              <AnimatePresence>
-                {menuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                    className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-100 dark:border-white/10 bg-white dark:bg-surface-darkCard p-1.5 shadow-xl"
-                  >
-                    <p className="truncate px-3 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">{user.name}</p>
-                    <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5">Dashboard</Link>
-                    <Link to="/profile" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5">Profile</Link>
-                    <Link to="/orders" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5">Orders</Link>
-                    {user.role === 'admin' && <Link to="/admin" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5">Admin Panel</Link>}
-                    <button onClick={handleLogout} className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
-                      <HiOutlineArrowRightOnRectangle className="h-4 w-4" /> Logout
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <AnimatePresence>
+  {open && (
+    <>
+      {/* Background Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => setOpen(false)}
+        className="fixed inset-0 bg-black/50 z-[99] lg:hidden"
+      />
+
+      {/* Mobile Drawer */}
+      <motion.aside
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-0 right-0 h-screen w-72 bg-white dark:bg-slate-900 shadow-2xl z-[100] lg:hidden overflow-y-auto"
+      >
+        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700">
+          <h2 className="text-xl font-bold">Menu</h2>
+
+          <button onClick={() => setOpen(false)}>
+            <HiOutlineXMark className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="flex flex-col p-4 space-y-2">
+
+          {[...navLinks,
+            { to: "/wishlist", label: "Wishlist" },
+            { to: "/chat", label: "Chat" },
+            { to: "/dashboard", label: "Dashboard" }
+          ].map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          {user ? (
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleLogout();
+              }}
+              className="text-left rounded-lg px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              Login
+            </Link>
+          )}
+
+        </div>
+      </motion.aside>
+    </>
+  )}
+</AnimatePresence>
+             
             </div>
           ) : (
             <Link to="/login" className="btn-primary !px-4 !py-2 text-xs">Login</Link>

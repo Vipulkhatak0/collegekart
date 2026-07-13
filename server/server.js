@@ -12,19 +12,17 @@ import orderRoutes from './routes/orderRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
-
+const allowedOrigins = [
+  'https://collegekart.shop',
+  'https://www.collegekart.shop',
+  'http://localhost:5173'
+];
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: allowedOrigins } });
 
 app.set('io', io);
-
-const allowedOrigins = [
-  'https://collegekart.shop',
-  'https://www.collegekart.shop',
-  'http://localhost:5173'
-];
 
 app.use(cors({
   origin: (origin, callback) => {

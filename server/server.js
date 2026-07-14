@@ -10,8 +10,7 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import affiliateProductRoutes from './routes/affiliateProductRoutes.js';
-app.use('/api/affiliate-products', affiliateProductRoutes);
+import affiliateProductRoutes from './routes/affiliateProductRoutes.js';   // ← import here, top only
 
 const allowedOrigins = [
   'https://collegekart.shop',
@@ -19,7 +18,7 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
-const app = express();
+const app = express();   // ← app is created here
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: allowedOrigins } });
 
@@ -41,7 +40,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/affiliate-products', affiliateProductRoutes);
+app.use('/api/affiliate-products', affiliateProductRoutes);   // ← app.use() only goes down here, with the others
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
 

@@ -2,7 +2,6 @@ import "dotenv/config";
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-
 import http from 'http';
 import { Server } from 'socket.io';
 
@@ -11,6 +10,8 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import affiliateProductRoutes from './routes/affiliateProductRoutes.js';
+app.use('/api/affiliate-products', affiliateProductRoutes);
 
 const allowedOrigins = [
   'https://collegekart.shop',
@@ -26,7 +27,6 @@ app.set('io', io);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like curl, Postman, server-to-server)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -41,10 +41,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/affiliate-products', affiliateProductRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
 
-// Real-time chat: each user joins a room keyed by their own userId
 io.on('connection', (socket) => {
   socket.on('join', (userId) => socket.join(userId));
   socket.on('sendMessage', (message) => {

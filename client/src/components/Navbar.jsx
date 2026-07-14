@@ -11,6 +11,7 @@ import useAuth from '../context/AuthContext.jsx';
 const navLinks = [
   { to: '/browse', label: 'Browse' },
   { to: '/categories', label: 'Categories' },
+  { to: '/student-essentials', label: 'Essentials' }, // ← Added here
   { to: '/sell', label: 'Sell' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' }
@@ -212,7 +213,7 @@ export default function Navbar() {
               {/* Links */}
               <div className="flex flex-col gap-2 p-4">
                 {[
-                  ...navLinks,
+                  ...navLinks, // Automatically includes your new 'Essentials' link here as well!
                   { to: "/wishlist", label: "Wishlist" },
                   { to: "/chat", label: "Chat" },
                   { to: "/dashboard", label: "Dashboard" },

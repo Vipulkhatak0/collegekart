@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
 import Categories from './pages/Categories.jsx';
+import StudentEssentials from './pages/StudentEssentials.jsx'; // ← Added here
 import ProductDetails from './pages/ProductDetails.jsx';
 import SellProduct from './pages/SellProduct.jsx';
 import Wishlist from './pages/Wishlist.jsx';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<BrowseProducts />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/student-essentials" element={<StudentEssentials />} /> {/* ← Added here */}
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

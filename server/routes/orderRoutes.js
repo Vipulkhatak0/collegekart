@@ -2,10 +2,8 @@ import express from 'express';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import { protect } from '../middleware/auth.js';
-const { protect, adminOnly } = require("../middleware/auth");
 
 const router = express.Router();
-
 // @route GET /api/orders/me
 router.get('/me', protect, async (req, res) => {
   const orders = await Order.find({ buyer: req.user._id }).populate('product').sort({ createdAt: -1 });

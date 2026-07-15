@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../lib/api.js";
 import ProductCard from "../components/ProductCard";
 
 const categories = ["all", "books", "notes", "electronics", "laptops", "mobiles", "hostel", "furniture", "fashion", "sports", "calculators", "cycles", "gaming", "accessories", "others"];
@@ -10,8 +10,8 @@ export default function StudentEssentials() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get("/api/affiliate-products")
-     .then((res) => setProducts(res.data.affiliateProducts || []))
+    api.get("/affiliate-products")
+      .then((res) => setProducts(res.data.affiliateProducts || []))
       .catch((err) => console.error("Failed to load affiliate products:", err))
       .finally(() => setLoading(false));
   }, []);

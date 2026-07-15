@@ -1,39 +1,48 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import toast from "react-hot-toast";
+import api, { getErrorMessage } from "../lib/api.js";
 
 export default function AffiliateProductsAdmin() {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({
-    title: "", image: "", price: "", rating: 4.5, category: "Books", affiliateLink: "",
+    title: "", image: "", price: "", rating: 4.5, category: "books", affiliateLink: "",
   });
 
   const fetchProducts = async () => {
-   const res = await axios.get("/api/affiliate-products");
-setProducts(res.data.affiliateProducts);   // ← .affiliateProducts, not res.data
+    try {
+      const res = await api.get("/affiliate-products");
+      setProducts(res.data.affiliateProducts);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
   };
 
   useEffect(() => { fetchProducts(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("/api/affiliate-products", form, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    setForm({ title: "", image: "", price: "", rating: 4.5, category: "Books", affiliateLink: "" });
-    fetchProducts();
+    try {
+      await api.post("/affiliate-products", form);
+      setForm({ title: "", image: "", price: "", rating: 4.5, category: "books", affiliateLink: "" });
+      toast.success("Product added.");
+      fetchProducts();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/affiliate-products/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    fetchProducts();
+    try {
+      await api.delete(`/affiliate-products/${id}`);
+      toast.success("Product removed.");
+      fetchProducts();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="font-display text-xl font-bold mb-4 dark:text-white">Affiliate Products</h2>
-
+    <div>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3 mb-6">
         <input placeholder="Title" value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -47,7 +56,7 @@ setProducts(res.data.affiliateProducts);   // ← .affiliateProducts, not res.da
         <select value={form.category}
           onChange={(e) => setForm({ ...form, category: e.target.value })}
           className="border rounded-lg px-3 py-2 dark:bg-white/5 dark:border-white/10 dark:text-white">
-          {["Books", "Laptops", "Headphones", "Printers", "Smartphones", "Backpacks"].map((c) => (
+          {['books', 'notes', 'electronics', 'laptops', 'mobiles', 'hostel', 'furniture', 'fashion', 'sports', 'calculators', 'cycles', 'gaming', 'accessories', 'others'].map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>

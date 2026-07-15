@@ -74,12 +74,27 @@ export default function AdminPanel() {
                   <td className="p-3 font-medium">{p.title}</td>
                   <td className="p-3 text-slate-500 dark:text-slate-400">{p.seller?.name}</td>
                   <td className="p-3">₹{p.price?.toLocaleString()}</td>
-                  <td className="p-3"><span className="rounded-full bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400">{p.status}</span></td>
-                  <td className="p-3"><button onClick={() => removeListing(p._id)} className="text-xs font-semibold text-red-500">Remove</button></td>
+                  <td className="p-3">
+                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      {p.status}
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    <button onClick={() => removeListing(p._id)} className="text-xs font-semibold text-red-500">
+                      Remove
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-lg font-bold mb-4">Affiliate Products</h2>
+        <div className="glass-card p-4">
+          <AffiliateProductsAdmin />
         </div>
       </div>
     </div>

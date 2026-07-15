@@ -3,11 +3,12 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import AffiliateProductDetail from './pages/AffiliateProductDetail.jsx';
 
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
 import Categories from './pages/Categories.jsx';
-import StudentEssentials from './pages/StudentEssentials.jsx'; // ← Added here
+import StudentEssentials from './pages/StudentEssentials.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
 import SellProduct from './pages/SellProduct.jsx';
 import Wishlist from './pages/Wishlist.jsx';
@@ -31,10 +32,12 @@ export default function App() {
       <Navbar />
       <main className="flex-1">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<BrowseProducts />} />
           <Route path="/categories" element={<Categories />} />
-          <Route path="/student-essentials" element={<StudentEssentials />} /> {/* ← Added here */}
+          <Route path="/student-essentials" element={<StudentEssentials />} />
+          <Route path="/student-essentials/:id" element={<AffiliateProductDetail />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -43,7 +46,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Everything below requires the user to be logged in */}
+          {/* Protected Routes (Require Login) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/sell" element={<SellProduct />} />
             <Route path="/wishlist" element={<Wishlist />} />

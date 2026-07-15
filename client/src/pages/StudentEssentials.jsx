@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../lib/api.js";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/AffiliateProductCard.jsx.jsx";
 
 const categories = ["all", "books", "notes", "electronics", "laptops", "mobiles", "hostel", "furniture", "fashion", "sports", "calculators", "cycles", "gaming", "accessories", "others"];
 

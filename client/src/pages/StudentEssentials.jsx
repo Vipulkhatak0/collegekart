@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../lib/api.js";
-import ProductCard from "../components/AffiliateProductCard.jsx.jsx";
+import AffiliateProductCard from "../components/AffiliateProductCard";
 
 const categories = ["all", "books", "notes", "electronics", "laptops", "mobiles", "hostel", "furniture", "fashion", "sports", "calculators", "cycles", "gaming", "accessories", "others"];
 
@@ -50,9 +50,9 @@ export default function StudentEssentials() {
         <p className="text-slate-500 dark:text-slate-400">No products yet — check back soon!</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+         {filtered.map((product) => (
+  <AffiliateProductCard key={product._id} product={product} />
+))}
         </div>
       )}
 

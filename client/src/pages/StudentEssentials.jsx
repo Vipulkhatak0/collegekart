@@ -25,7 +25,7 @@ export default function StudentEssentials() {
         🔥 Student Essentials
       </h1>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-        Hand-picked picks for hostel life, study sessions, and everything in between.
+         hostel essentiials , study sessions, and everything in between.
       </p>
 
       <div className="flex gap-2 flex-wrap mb-6">

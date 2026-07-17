@@ -11,7 +11,9 @@ import useAuth from '../context/AuthContext.jsx';
 const navLinks = [
   { to: '/browse', label: 'Browse' },
   { to: '/categories', label: 'Categories' },
-  { to: '/student-essentials', label: 'Essentials' }, // ← Added here
+  { to: '/student-essentials', label: 'Essentials' },
+  { to: '/notes', label: 'Library' },
+  { to: '/services', label: 'Services' },
   { to: '/sell', label: 'Sell' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' }

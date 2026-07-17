@@ -24,6 +24,12 @@ import AdminPanel from './pages/AdminPanel.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
+import Notes from './pages/Notes.jsx';
+import UploadNote from './pages/UploadNote.jsx';
+import NoteDetail from './pages/NoteDetail.jsx';
+import ServiceRequests from './pages/ServiceRequests.jsx';
+import PostServiceRequest from './pages/PostServiceRequest.jsx';
+import ServiceRequestDetail from './pages/ServiceRequestDetail.jsx';
 
 export default function App() {
   return (
@@ -45,8 +51,14 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/notes" element={<Notes />} />
+<Route path="/notes/:id" element={<NoteDetail />} />
+<Route path="/services" element={<ServiceRequests />} />
+<Route path="/services/:id" element={<ServiceRequestDetail />} />
 
           {/* Protected Routes (Require Login) */}
+          <Route path="/notes/upload" element={<UploadNote />} />
+<Route path="/services/post" element={<PostServiceRequest />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/sell" element={<SellProduct />} />
             <Route path="/wishlist" element={<Wishlist />} />

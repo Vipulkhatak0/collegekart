@@ -10,7 +10,7 @@ export default function Register() {
   const { register, verifyOtp } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: '', email: '', password: '', hostel: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', hostel: '', college: '' });
   const [userId, setUserId] = useState(null);
   const [otp, setOtp] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -60,6 +60,7 @@ export default function Register() {
           <>
             <form onSubmit={handleRegister} className="mt-6 space-y-4">
               <input value={form.name} onChange={update('name')} placeholder="Full Name" className="input-field" required />
+              <input value={form.college} onChange={update('college')} placeholder="College Name" className="input-field" required />
               <input type="email" value={form.email} onChange={update('email')} placeholder="Campus Email" className="input-field" required />
               <input type="password" value={form.password} onChange={update('password')} placeholder="Password" className="input-field" required minLength={6} />
               <input value={form.hostel} onChange={update('hostel')} placeholder="Hostel / Block (optional)" className="input-field" />

@@ -11,6 +11,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import affiliateProductRoutes from './routes/affiliateProductRoutes.js';   // ← import here, top only
+import serviceRequestRoutes from './routes/serviceRequestRoutes.js';
 
 const allowedOrigins = [
   'https://collegekart.shop',
@@ -35,6 +36,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.use('/api/service-requests', serviceRequestRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);

@@ -23,6 +23,7 @@ const toPublicUser = (user) => ({
   avatar: user.avatar,
   phone: user.phone,
   hostel: user.hostel,
+  college: user.college,
   role: user.role,
   sellerRating: user.sellerRating,
   isSellerVerified: user.isSellerVerified,
@@ -32,7 +33,7 @@ const toPublicUser = (user) => ({
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, hostel } = req.body;
+    const { name, email, password, hostel, college } = req.body;
     if (!name || !email || !password) return res.status(400).json({ message: 'Name, email and password are required.' });
 
     const existing = await User.findOne({ email });
@@ -46,6 +47,7 @@ router.post('/register', async (req, res) => {
       existing.name = name;
       existing.password = await bcrypt.hash(password, 10);
       existing.hostel = hostel;
+      existing.college = college;
       existing.otp = otp;
       existing.otpExpires = Date.now() + 10 * 60 * 1000;
       await existing.save();
@@ -56,7 +58,7 @@ router.post('/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const otp = generateOTP();
     const user = await User.create({
-      name, email, password: hashed, hostel,
+      name, email, password: hashed, hostel, college,
       otp, otpExpires: Date.now() + 10 * 60 * 1000
     });
     await sendOTPEmail(email, otp);

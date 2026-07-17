@@ -4,11 +4,12 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, select: false }, // not required if using Google OAuth
+    password: { type: String, select: false },
     googleId: { type: String },
     avatar: { type: String, default: '' },
     phone: { type: String },
     hostel: { type: String },
+    college: { type: String, trim: true },   // ← add this line
     isVerified: { type: Boolean, default: false },
     otp: { type: String, select: false },
     otpExpires: { type: Date, select: false },

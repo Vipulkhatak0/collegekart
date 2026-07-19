@@ -7,8 +7,8 @@ const router = express.Router();
 
 // @route PUT /api/users/me
 router.put('/me', protect, async (req, res) => {
-  const { name, phone, hostel, avatar } = req.body;
-  const user = await User.findByIdAndUpdate(req.user._id, { name, phone, hostel, avatar }, { new: true });
+  const { name, phone, hostel, college, avatar } = req.body;
+  const user = await User.findByIdAndUpdate(req.user._id, { name, phone, hostel, college, avatar }, { new: true });
   res.json({ user });
 });
 

@@ -9,12 +9,13 @@ export default function Profile() {
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [hostel, setHostel] = useState(user?.hostel || '');
+  const [college, setCollege] = useState(user?.college || '');
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
     setSaving(true);
     try {
-      const { data } = await api.put('/users/me', { name, phone, hostel });
+      const { data } = await api.put('/users/me', { name, phone, hostel, college });
       updateUser(data.user);
       toast.success('Profile updated!');
     } catch (err) {
@@ -58,6 +59,10 @@ export default function Profile() {
           <div>
             <label className="text-sm font-medium">Hostel / Block</label>
             <input value={hostel} onChange={(e) => setHostel(e.target.value)} placeholder="Block C" className="input-field mt-1.5" />
+          </div>
+          <div>
+            <label className="text-sm font-medium">College Name</label>
+            <input value={college} onChange={(e) => setCollege(e.target.value)} placeholder="e.g. XYZ Institute of Technology" className="input-field mt-1.5" />
           </div>
         </div>
 

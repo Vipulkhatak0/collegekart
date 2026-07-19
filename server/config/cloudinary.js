@@ -18,4 +18,16 @@ const storage = new CloudinaryStorage({
 });
 
 export const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB per image
+
+const notesStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'collegekart/notes',
+    resource_type: 'auto',
+    allowed_formats: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'webp']
+  }
+});
+
+export const uploadNote = multer({ storage: notesStorage, limits: { fileSize: 15 * 1024 * 1024 } });
+
 export default cloudinary;

@@ -10,6 +10,7 @@ router.get('/threads', protect, async (req, res) => {
     .populate('sender', 'name avatar')
     .populate('receiver', 'name avatar')
     .populate('product', 'title images')
+    .populate('serviceRequest', 'title')
     .sort({ createdAt: -1 });
   res.json({ messages });
 });
@@ -25,6 +26,7 @@ router.get('/:userId', protect, async (req, res) => {
     .populate('sender', 'name avatar')
     .populate('receiver', 'name avatar')
     .populate('product', 'title images')
+    .populate('serviceRequest', 'title')
     .sort({ createdAt: 1 });
   res.json({ messages });
 });
@@ -32,18 +34,18 @@ router.get('/:userId', protect, async (req, res) => {
 // @route POST /api/messages
 router.post('/', protect, async (req, res) => {
   try {
-    const { receiverId, productId, text, isOffer, offerAmount } = req.body;
+    const { receiverId, productId, serviceRequestId, text, isOffer, offerAmount } = req.body;
     let message = await Message.create({
-      sender: req.user._id, receiver: receiverId, product: productId,
+      sender: req.user._id, receiver: receiverId, product: productId, serviceRequest: serviceRequestId,
       text, isOffer, offerAmount
     });
     message = await message.populate([
       { path: 'sender', select: 'name avatar' },
       { path: 'receiver', select: 'name avatar' },
-      { path: 'product', select: 'title images' }
+      { path: 'product', select: 'title images' },
+      { path: 'serviceRequest', select: 'title' }
     ]);
 
-    // Deliver in real-time to the receiver (and echo back to the sender's other tabs).
     const io = req.app.get('io');
     io.to(String(receiverId)).emit('newMessage', message);
     io.to(String(req.user._id)).emit('newMessage', message);

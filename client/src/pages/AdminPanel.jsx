@@ -91,12 +91,7 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      <div className="mt-10">
-        <h2 className="text-lg font-bold mb-4">Affiliate Products</h2>
-        <div className="glass-card p-4">
-          <AffiliateProductsAdmin />
-        </div>
-      </div>
+      
     </div>
   );
 }

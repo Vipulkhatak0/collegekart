@@ -1,19 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiOutlineLockClosed } from 'react-icons/hi2';
 import useAuth from '../context/AuthContext.jsx';
 import GoogleButton from '../components/GoogleButton.jsx';
-import { getErrorMessage } from '../lib/api.js';
+import api, { getErrorMessage } from '../lib/api.js';
 
 export default function Register() {
   const { register, verifyOtp } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ name: '', email: '', password: '', hostel: '', college: '' });
+  const [collegeOptions, setCollegeOptions] = useState([]);
   const [userId, setUserId] = useState(null);
   const [otp, setOtp] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    api.get('/users/colleges/list')
+      .then((res) => setCollegeOptions(res.data.colleges || []))
+      .catch(() => {});
+  }, []);
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -60,7 +67,21 @@ export default function Register() {
           <>
             <form onSubmit={handleRegister} className="mt-6 space-y-4">
               <input value={form.name} onChange={update('name')} placeholder="Full Name" className="input-field" required />
-              <input value={form.college} onChange={update('college')} placeholder="College Name" className="input-field" required />
+              
+              <input
+                value={form.college}
+                onChange={update('college')}
+                placeholder="College Name"
+                className="input-field"
+                list="college-options"
+                required
+              />
+              <datalist id="college-options">
+                {collegeOptions.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+
               <input type="email" value={form.email} onChange={update('email')} placeholder="Campus Email" className="input-field" required />
               <input type="password" value={form.password} onChange={update('password')} placeholder="Password" className="input-field" required minLength={6} />
               <input value={form.hostel} onChange={update('hostel')} placeholder="Hostel / Block (optional)" className="input-field" />

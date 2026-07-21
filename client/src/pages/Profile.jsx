@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { HiCheckBadge, HiOutlineCamera } from 'react-icons/hi2';
 import useAuth from '../context/AuthContext.jsx';
@@ -10,7 +10,14 @@ export default function Profile() {
   const [phone, setPhone] = useState(user?.phone || '');
   const [hostel, setHostel] = useState(user?.hostel || '');
   const [college, setCollege] = useState(user?.college || '');
+  const [collegeOptions, setCollegeOptions] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.get('/users/colleges/list')
+      .then((res) => setCollegeOptions(res.data.colleges || []))
+      .catch(() => {});
+  }, []);
 
   const save = async () => {
     setSaving(true);
@@ -62,7 +69,18 @@ export default function Profile() {
           </div>
           <div>
             <label className="text-sm font-medium">College Name</label>
-            <input value={college} onChange={(e) => setCollege(e.target.value)} placeholder="e.g. XYZ Institute of Technology" className="input-field mt-1.5" />
+            <input
+              value={college}
+              onChange={(e) => setCollege(e.target.value)}
+              placeholder="e.g. XYZ Institute of Technology"
+              className="input-field mt-1.5"
+              list="college-options"
+            />
+            <datalist id="college-options">
+              {collegeOptions.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
           </div>
         </div>
 

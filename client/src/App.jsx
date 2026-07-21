@@ -3,12 +3,12 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
-import AffiliateProductDetail from './pages/AffiliateProductDetail.jsx';
+
 
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
 import Categories from './pages/Categories.jsx';
-import StudentEssentials from './pages/StudentEssentials.jsx';
+
 import ProductDetails from './pages/ProductDetails.jsx';
 import SellProduct from './pages/SellProduct.jsx';
 import Wishlist from './pages/Wishlist.jsx';

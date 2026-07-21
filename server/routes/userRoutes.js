@@ -28,6 +28,16 @@ router.get('/wishlist', protect, async (req, res) => {
   res.json({ wishlist: user.wishlist });
 });
 
+// @route GET /api/users/colleges/list — distinct college names, for autocomplete
+router.get('/colleges/list', async (req, res) => {
+  try {
+    const colleges = await User.distinct('college');
+    res.json({ colleges: colleges.filter(Boolean).sort() });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch colleges.', error: err.message });
+  }
+});
+
 // --- Admin (must come before the generic '/:id' route below) ---
 // @route GET /api/users (admin)
 router.get('/', protect, adminOnly, async (req, res) => {

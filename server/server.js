@@ -10,7 +10,7 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import affiliateProductRoutes from './routes/affiliateProductRoutes.js';
+
 import serviceRequestRoutes from './routes/serviceRequestRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 
@@ -43,7 +43,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/affiliate-products', affiliateProductRoutes);
+
 app.use('/api/notes', noteRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));

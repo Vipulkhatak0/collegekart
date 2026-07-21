@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const messageSchema = new mongoose.Schema(
   {
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+    serviceRequest: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceRequest' },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     receiver: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     text: { type: String, required: true },
@@ -14,16 +15,3 @@ const messageSchema = new mongoose.Schema(
 );
 
 export default mongoose.model('Message', messageSchema);
-const messageSchema = new mongoose.Schema(
-  {
-    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-    serviceRequest: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceRequest' },
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    receiver: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    text: { type: String, required: true },
-    isOffer: { type: Boolean, default: false },
-    offerAmount: { type: Number },
-    readAt: { type: Date }
-  },
-  { timestamps: true }
-);

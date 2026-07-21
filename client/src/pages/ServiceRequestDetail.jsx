@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api, { getErrorMessage } from "../lib/api.js";
 import useAuth from "../context/AuthContext.jsx";
 
 export default function ServiceRequestDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [request, setRequest] = useState(null);
   const [bids, setBids] = useState([]);
@@ -92,10 +93,19 @@ export default function ServiceRequestDetail() {
           <span>Posted by {request.buyer?.name}</span>
         </div>
 
+        {!isOwner && (
+          <button
+            onClick={() => navigate(`/chat?with=${request.buyer._id}&service=${request._id}`)}
+            className="mt-4 rounded-full border border-primary-500 text-primary-600 dark:text-primary-400 px-4 py-2 text-sm font-semibold"
+          >
+            Message {request.buyer?.name}
+          </button>
+        )}
+
         {isOwner && request.status === "assigned" && (
           <button
             onClick={handleComplete}
-            className="mt-4 rounded-full bg-emerald-500 text-white px-5 py-2 text-sm font-semibold"
+            className="mt-4 ml-2 rounded-full bg-emerald-500 text-white px-5 py-2 text-sm font-semibold"
           >
             Mark as Completed
           </button>
@@ -129,13 +139,23 @@ export default function ServiceRequestDetail() {
                 ✓ Accepted
               </span>
             )}
-            {isOwner && request.status === "open" && bid.status === "pending" && (
-              <button
-                onClick={() => handleAccept(bid._id)}
-                className="mt-2 rounded-full bg-brand-gradient text-white px-4 py-1.5 text-xs font-semibold"
-              >
-                Accept this bid
-              </button>
+            {isOwner && (
+              <div className="mt-2 flex gap-2">
+                {request.status === "open" && bid.status === "pending" && (
+                  <button
+                    onClick={() => handleAccept(bid._id)}
+                    className="rounded-full bg-brand-gradient text-white px-4 py-1.5 text-xs font-semibold"
+                  >
+                    Accept this bid
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate(`/chat?with=${bid.provider._id}&service=${request._id}`)}
+                  className="rounded-full border border-primary-500 text-primary-600 dark:text-primary-400 px-4 py-1.5 text-xs font-semibold"
+                >
+                  Chat
+                </button>
+              </div>
             )}
           </div>
         ))}

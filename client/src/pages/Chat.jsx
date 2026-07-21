@@ -12,8 +12,9 @@ export default function Chat() {
   const [searchParams] = useSearchParams();
   const startWithUserId = searchParams.get('with');
   const startProductId = searchParams.get('product');
+  const startServiceId = searchParams.get('service');
 
-  const [threads, setThreads] = useState([]); // [{ userId, name, avatar, product, lastMessage, time }]
+  const [threads, setThreads] = useState([]);
   const [activeUserId, setActiveUserId] = useState(startWithUserId || null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -23,7 +24,6 @@ export default function Chat() {
 
   const myId = user?.id || user?._id;
 
-  // Build the thread list from all messages the user has ever sent/received.
   const loadThreads = useCallback(async () => {
     setLoadingThreads(true);
     try {
@@ -34,17 +34,17 @@ export default function Chat() {
         if (!map.has(other._id) || new Date(m.createdAt) > new Date(map.get(other._id).time)) {
           map.set(other._id, {
             userId: other._id, name: other.name, avatar: other.avatar,
-            product: m.product?.title, lastMessage: m.text, time: m.createdAt
+            product: m.product?.title, service: m.serviceRequest?.title,
+            lastMessage: m.text, time: m.createdAt
           });
         }
       }
       let list = Array.from(map.values()).sort((a, b) => new Date(b.time) - new Date(a.time));
 
-      // If we arrived here via "Chat with seller" and there's no existing thread yet, synthesize one.
       if (startWithUserId && !list.some((t) => t.userId === startWithUserId)) {
         try {
           const { data: userData } = await api.get(`/users/${startWithUserId}`);
-          list = [{ userId: startWithUserId, name: userData.user.name, avatar: userData.user.avatar, product: null, lastMessage: 'Start the conversation...', time: new Date().toISOString() }, ...list];
+          list = [{ userId: startWithUserId, name: userData.user.name, avatar: userData.user.avatar, product: null, service: null, lastMessage: 'Start the conversation...', time: new Date().toISOString() }, ...list];
         } catch { /* seller lookup failed, ignore */ }
       }
       setThreads(list);
@@ -57,7 +57,6 @@ export default function Chat() {
 
   useEffect(() => { loadThreads(); }, [loadThreads]);
 
-  // Load the conversation for whichever thread is active.
   useEffect(() => {
     if (!activeUserId) return;
     api.get(`/messages/${activeUserId}`)
@@ -65,11 +64,9 @@ export default function Chat() {
       .catch((err) => toast.error(getErrorMessage(err)));
   }, [activeUserId]);
 
-  // Keep a ref of the active thread so the socket handler below always sees the latest value.
   const activeUserIdRef = useRef(activeUserId);
   useEffect(() => { activeUserIdRef.current = activeUserId; }, [activeUserId]);
 
-  // Socket.io: join our own room, listen for incoming messages in real time.
   useEffect(() => {
     if (!myId) return;
     const socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
@@ -97,7 +94,12 @@ export default function Chat() {
     const text = input.trim();
     setInput('');
     try {
-      const { data } = await api.post('/messages', { receiverId: activeUserId, productId: startProductId || undefined, text });
+      const { data } = await api.post('/messages', {
+        receiverId: activeUserId,
+        productId: startProductId || undefined,
+        serviceRequestId: startServiceId || undefined,
+        text
+      });
       setMessages((prev) => (prev.some((m) => m._id === data.message._id) ? prev : [...prev, data.message]));
       loadThreads();
     } catch (err) {
@@ -137,6 +139,7 @@ export default function Chat() {
               <div className="border-b border-slate-100 dark:border-white/10 p-4">
                 <p className="flex items-center gap-1 text-sm font-semibold">{activeThread.name} <HiCheckBadge className="h-3.5 w-3.5 text-primary-500" /></p>
                 {activeThread.product && <p className="text-xs text-slate-400">Re: {activeThread.product}</p>}
+                {activeThread.service && <p className="text-xs text-slate-400">Re: {activeThread.service}</p>}
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto p-4">
                 {messages.map((m) => {

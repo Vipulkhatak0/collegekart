@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { HiOutlineUsers, HiOutlineTag, HiOutlineExclamationTriangle } from 'react-icons/hi2';
 import useAuth from '../context/AuthContext.jsx';
 import api, { getErrorMessage } from '../lib/api.js';
-import AffiliateProductsAdmin from "../components/AffiliateProductsAdmin.jsx";
+
 
 export default function AdminPanel() {
   const { user } = useAuth();

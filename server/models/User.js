@@ -9,14 +9,15 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String, default: '' },
     phone: { type: String },
     hostel: { type: String },
-    college: { type: String, trim: true },   // ← add this line
+    college: { type: String, trim: true },
     isVerified: { type: Boolean, default: false },
     otp: { type: String, select: false },
     otpExpires: { type: Date, select: false },
     role: { type: String, enum: ['student', 'admin'], default: 'student' },
     sellerRating: { type: Number, default: 0 },
     isSellerVerified: { type: Boolean, default: false },
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    premiumExpiresAt: { type: Date, default: null }
   },
   { timestamps: true }
 );

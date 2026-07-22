@@ -13,6 +13,9 @@ import userRoutes from './routes/userRoutes.js';
 
 import serviceRequestRoutes from './routes/serviceRequestRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
+import gigRoutes from './routes/gigRoutes.js';
+import premiumRoutes from './routes/premiumRoutes.js';
+
 
 const allowedOrigins = [
   'https://collegekart.shop',
@@ -45,8 +48,11 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 
 app.use('/api/notes', noteRoutes);
+app.use('/api/gigs', gigRoutes);
+app.use('/api/premium', premiumRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
+
 
 io.on('connection', (socket) => {
   socket.on('join', (userId) => socket.join(userId));

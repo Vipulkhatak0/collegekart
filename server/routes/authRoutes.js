@@ -24,6 +24,7 @@ const toPublicUser = (user) => ({
   phone: user.phone,
   hostel: user.hostel,
   college: user.college,
+  premiumExpiresAt: user.premiumExpiresAt,
   role: user.role,
   sellerRating: user.sellerRating,
   isSellerVerified: user.isSellerVerified,

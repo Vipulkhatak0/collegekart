@@ -30,6 +30,9 @@ import NoteDetail from './pages/NoteDetail.jsx';
 import ServiceRequests from './pages/ServiceRequests.jsx';
 import PostServiceRequest from './pages/PostServiceRequest.jsx';
 import ServiceRequestDetail from './pages/ServiceRequestDetail.jsx';
+import Gigs from './pages/Gigs.jsx';
+import PostGig from './pages/PostGig.jsx';
+import GigDetail from './pages/GigDetail.jsx';
 
 export default function App() {
   return (
@@ -42,6 +45,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<BrowseProducts />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/gigs" element={<Gigs />} />
+<Route path="/gigs/:id" element={<GigDetail />} />
          
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
@@ -67,6 +72,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/gigs/post" element={<PostGig />} />
           </Route>
         </Routes>
       </main>

@@ -16,7 +16,9 @@ const navLinks = [
   { to: '/services', label: 'Services' },
   { to: '/sell', label: 'Sell' },
   { to: '/about', label: 'About' },
+  { to: '/gigs', label: 'Gigs' },
   { to: '/contact', label: 'Contact' }
+ 
 ];
 
 export default function Navbar() {

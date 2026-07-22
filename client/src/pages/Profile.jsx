@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { HiCheckBadge, HiOutlineCamera } from 'react-icons/hi2';
 import useAuth from '../context/AuthContext.jsx';
 import api, { getErrorMessage } from '../lib/api.js';
+import PremiumUpgrade from '../components/PremiumUpgrade.jsx';
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
@@ -85,6 +86,10 @@ export default function Profile() {
         </div>
 
         <button onClick={save} disabled={saving} className="btn-primary mt-6 disabled:opacity-60">{saving ? 'Saving...' : 'Save Changes'}</button>
+      </div>
+
+      <div className="mt-6">
+        <PremiumUpgrade />
       </div>
     </div>
   );

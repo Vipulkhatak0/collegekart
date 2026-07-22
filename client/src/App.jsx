@@ -33,6 +33,8 @@ import ServiceRequestDetail from './pages/ServiceRequestDetail.jsx';
 import Gigs from './pages/Gigs.jsx';
 import PostGig from './pages/PostGig.jsx';
 import GigDetail from './pages/GigDetail.jsx';
+import EditServiceRequest from './pages/EditServiceRequest.jsx';
+import EditGig from './pages/EditGig.jsx';
 
 export default function App() {
   return (
@@ -73,6 +75,8 @@ export default function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/gigs/post" element={<PostGig />} />
+            <Route path="/services/:id/edit" element={<EditServiceRequest />} />
+<Route path="/gigs/:id/edit" element={<EditGig />} />
           </Route>
         </Routes>
       </main>

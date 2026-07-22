@@ -63,8 +63,37 @@ export default function ServiceRequestDetail() {
     }
   };
 
+  const handleClose = async () => {
+    if (!window.confirm("Close this request? It will stop accepting new bids.")) return;
+    try {
+      await api.put(`/service-requests/${id}/close`);
+      toast.success("Request closed.");
+      fetchData();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Permanently delete this request? This cannot be undone.")) return;
+    try {
+      await api.delete(`/service-requests/${id}`);
+      toast.success("Request deleted.");
+      navigate("/services");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
   if (loading) return <div className="mx-auto max-w-2xl px-4 py-16 text-center text-slate-500 dark:text-slate-400">Loading...</div>;
   if (!request) return <div className="mx-auto max-w-2xl px-4 py-16 text-center text-slate-500 dark:text-slate-400">Request not found.</div>;
+
+  const statusColors = {
+    open: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
+    assigned: "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+    completed: "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
+    closed: "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400",
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
@@ -73,11 +102,7 @@ export default function ServiceRequestDetail() {
           <span className="rounded-full bg-primary-50 dark:bg-white/10 text-primary-600 dark:text-primary-400 text-xs font-semibold px-2.5 py-1 capitalize">
             {request.category}
           </span>
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-            request.status === "open" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" :
-            request.status === "assigned" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400" :
-            "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400"
-          }`}>
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${statusColors[request.status]}`}>
             {request.status}
           </span>
         </div>
@@ -93,23 +118,58 @@ export default function ServiceRequestDetail() {
           <span>Posted by {request.buyer?.name}</span>
         </div>
 
-        {!isOwner && (
-          <button
-            onClick={() => navigate(`/chat?with=${request.buyer._id}&service=${request._id}`)}
-            className="mt-4 rounded-full border border-primary-500 text-primary-600 dark:text-primary-400 px-4 py-2 text-sm font-semibold"
-          >
-            Message {request.buyer?.name}
-          </button>
+        {request.contactInfo && (
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+            <span className="font-semibold">Contact:</span> {request.contactInfo}
+          </p>
         )}
 
-        {isOwner && request.status === "assigned" && (
-          <button
-            onClick={handleComplete}
-            className="mt-4 ml-2 rounded-full bg-emerald-500 text-white px-5 py-2 text-sm font-semibold"
-          >
-            Mark as Completed
-          </button>
-        )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {!isOwner && (
+            <button
+              onClick={() => navigate(`/chat?with=${request.buyer._id}&service=${request._id}`)}
+              className="rounded-full border border-primary-500 text-primary-600 dark:text-primary-400 px-4 py-2 text-sm font-semibold"
+            >
+              Message {request.buyer?.name}
+            </button>
+          )}
+
+          {isOwner && request.status === "assigned" && (
+            <button
+              onClick={handleComplete}
+              className="rounded-full bg-emerald-500 text-white px-5 py-2 text-sm font-semibold"
+            >
+              Mark as Completed
+            </button>
+          )}
+
+          {isOwner && request.status === "open" && (
+            <button
+              onClick={() => navigate(`/services/${id}/edit`)}
+              className="rounded-full border border-slate-400 text-slate-600 dark:text-slate-300 px-5 py-2 text-sm font-semibold"
+            >
+              Edit
+            </button>
+          )}
+
+          {isOwner && (request.status === "open" || request.status === "assigned") && (
+            <button
+              onClick={handleClose}
+              className="rounded-full border border-slate-400 text-slate-600 dark:text-slate-300 px-5 py-2 text-sm font-semibold"
+            >
+              Close Request
+            </button>
+          )}
+
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              className="rounded-full border border-red-400 text-red-500 px-5 py-2 text-sm font-semibold"
+            >
+              Delete
+            </button>
+          )}
+        </div>
       </div>
 
       <h2 className="mt-8 font-display text-lg font-bold text-slate-800 dark:text-white">

@@ -128,5 +128,26 @@ router.delete('/:id', protect, async (req, res) => {
     res.status(500).json({ message: 'Failed to cancel request.', error: err.message });
   }
 });
+// @route PUT /api/service-requests/:id — edit title/description/etc, owner only, only while open
+router.put('/:id', protect, async (req, res) => {
+  try {
+    const request = await ServiceRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found.' });
+    if (String(request.buyer) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized.' });
+    }
+    if (request.status !== 'open') {
+      return res.status(400).json({ message: 'Can only edit while the request is open.' });
+    }
+
+    const { title, description, category, budget, deadline, contactInfo } = req.body;
+    Object.assign(request, { title, description, category, budget, deadline, contactInfo });
+    await request.save();
+
+    res.json({ request });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update request.', error: err.message });
+  }
+});
 
 export default router;

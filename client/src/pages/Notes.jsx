@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api.js";
+import AdUnit from "../components/AdUnit.jsx";
 
 const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const types = [
@@ -151,6 +152,12 @@ export default function Notes() {
               </p>
             </Link>
           ))}
+        </div>
+      )}
+
+      {!loading && notes.length > 0 && (
+        <div className="mt-10">
+          <AdUnit slot="5638179916" />
         </div>
       )}
     </div>

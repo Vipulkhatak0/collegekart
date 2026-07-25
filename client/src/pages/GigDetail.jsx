@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api, { getErrorMessage } from "../lib/api.js";
 import useAuth from "../context/AuthContext.jsx";
+import AdUnit from "../components/AdUnit.jsx";
 
 const isPremiumActive = (provider) => provider?.premiumExpiresAt && new Date(provider.premiumExpiresAt) > new Date();
 
@@ -83,22 +84,26 @@ export default function GigDetail() {
             </button>
           )}
           {isOwner && (
-  <>
-    <button
-      onClick={() => navigate(`/gigs/${id}/edit`)}
-      className="rounded-full border border-slate-400 text-slate-600 dark:text-slate-300 px-5 py-2.5 text-sm font-semibold"
-    >
-      Edit
-    </button>
-    <button
-      onClick={handleDelete}
-      className="rounded-full border border-red-400 text-red-500 px-5 py-2.5 text-sm font-semibold"
-    >
-      Delete Gig
-    </button>
-  </>
-)}
+            <>
+              <button
+                onClick={() => navigate(`/gigs/${id}/edit`)}
+                className="rounded-full border border-slate-400 text-slate-600 dark:text-slate-300 px-5 py-2.5 text-sm font-semibold"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                className="rounded-full border border-red-400 text-red-500 px-5 py-2.5 text-sm font-semibold"
+              >
+                Delete Gig
+              </button>
+            </>
+          )}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <AdUnit slot="5638179916" />
       </div>
     </div>
   );

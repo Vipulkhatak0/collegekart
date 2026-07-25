@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api.js";
+import AdUnit from "../components/AdUnit.jsx";
 
 const categories = [
   { value: "all", label: "All" },
@@ -98,6 +99,12 @@ export default function ServiceRequests() {
               </p>
             </Link>
           ))}
+        </div>
+      )}
+
+      {!loading && requests.length > 0 && (
+        <div className="mt-10">
+          <AdUnit slot="5638179916" />
         </div>
       )}
     </div>

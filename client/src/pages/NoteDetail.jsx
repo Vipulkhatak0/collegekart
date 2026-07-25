@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api, { getErrorMessage } from "../lib/api.js";
+import AdUnit from "../components/AdUnit.jsx";
 
 export default function NoteDetail() {
   const { id } = useParams();
@@ -80,6 +81,10 @@ export default function NoteDetail() {
             {downloading ? "Preparing..." : "Download Free"}
           </button>
         )}
+      </div>
+
+      <div className="mt-6">
+        <AdUnit slot="5638179916" />
       </div>
     </div>
   );

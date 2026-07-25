@@ -8,6 +8,7 @@ import {
 import ProductCard from '../components/ProductCard.jsx';
 import api, { getErrorMessage } from '../lib/api.js';
 import useAuth from '../context/AuthContext.jsx';
+import AdUnit from '../components/AdUnit.jsx';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -84,8 +85,6 @@ export default function ProductDetails() {
   const buyNow = () => requireLogin(async () => {
     setBuying(true);
     try {
-      // Re-check availability right before buying — someone else may have bought it
-      // in the meantime since this page was first loaded.
       const { data: fresh } = await api.get(`/products/${product._id}`);
       if (fresh.product.status !== 'active') {
         setProduct(fresh.product);
@@ -213,6 +212,10 @@ export default function ProductDetails() {
           <div className="mt-8">
             <h3 className="text-sm font-semibold">Description</h3>
             <p className="mt-2 whitespace-pre-line text-sm text-slate-500 dark:text-slate-400">{product.description}</p>
+          </div>
+
+          <div className="mt-8">
+            <AdUnit slot="5638179916" />
           </div>
         </div>
       </div>

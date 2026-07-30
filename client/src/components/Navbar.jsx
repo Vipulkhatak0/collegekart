@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -25,6 +25,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const searchRef = useRef(null);
 
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +39,17 @@ export default function Navbar() {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Handle outside clicks to collapse the search bar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -55,6 +67,7 @@ export default function Navbar() {
     e.preventDefault();
     navigate(search.trim() ? `/browse?search=${encodeURIComponent(search.trim())}` : '/browse');
     setSearch('');
+    setSearchFocused(false);
   };
 
   const handleLogout = () => {
@@ -119,6 +132,7 @@ export default function Navbar() {
 
         {/* Search Bar */}
         <motion.form
+          ref={searchRef}
           onSubmit={handleSearch}
           animate={{ maxWidth: searchFocused ? 480 : 384 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
@@ -133,7 +147,6 @@ export default function Navbar() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
             placeholder="Search for books, laptops, notes..."
             className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
           /> 

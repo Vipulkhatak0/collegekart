@@ -41,7 +41,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Handle outside clicks to collapse the search bar
+  // Collapse search when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -131,12 +131,11 @@ export default function Navbar() {
         </nav>
 
         {/* Search Bar */}
-        <motion.form
+        <form
           ref={searchRef}
           onSubmit={handleSearch}
-          animate={{ maxWidth: searchFocused ? 480 : 384 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-          className={`hidden md:flex flex-1 items-center gap-2 rounded-full border bg-white/60 dark:bg-white/5 px-4 py-2 transition-all duration-200 ${
+          onClick={() => setSearchFocused(true)}
+          className={`hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border bg-white/60 dark:bg-white/5 px-4 py-2 transition-all duration-200 cursor-text ${
             searchFocused
               ? 'border-primary-400 shadow-[0_0_0_4px_rgba(59,95,227,0.12)]'
               : 'border-slate-200 dark:border-white/10'
@@ -150,7 +149,7 @@ export default function Navbar() {
             placeholder="Search for books, laptops, notes..."
             className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
           /> 
-        </motion.form>
+        </form>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-1.5 sm:gap-2">

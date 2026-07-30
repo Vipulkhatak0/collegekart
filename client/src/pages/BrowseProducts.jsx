@@ -8,6 +8,7 @@ import api, { getErrorMessage } from '../lib/api.js';
 import useAuth from '../context/AuthContext.jsx';
 import { getCurrentPosition } from '../lib/geo.js';
 import AdUnit from '../components/AdUnit.jsx';
+import NoteCard from '../components/NoteCard.jsx';
 
 export default function BrowseProducts() {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ export default function BrowseProducts() {
 
   const [sort, setSort] = useState('recent');
   const [products, setProducts] = useState([]);
+  const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [nearMe, setNearMe] = useState(false);
   const [coords, setCoords] = useState(null);
@@ -31,8 +33,14 @@ export default function BrowseProducts() {
         params.lng = coords.lng; 
         params.radiusKm = 15; 
       }
-      const { data } = await api.get('/products', { params });
-      setProducts(data.products);
+
+      const [productsRes, notesRes] = await Promise.all([
+        api.get('/products', { params }),
+        api.get('/notes', { params: { search: search || undefined } })
+      ]);
+
+      setProducts(productsRes.data.products);
+      setNotes(notesRes.data.notes || []);
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -83,7 +91,7 @@ export default function BrowseProducts() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
       <h1 className="font-display text-2xl font-bold">Browse Products</h1>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        {loading ? 'Loading listings...' : `${products.length} listing${products.length === 1 ? '' : 's'}${nearMe ? ' near you' : ' available'}`}
+        {loading ? 'Loading listings...' : `${products.length + notes.length} listing${(products.length + notes.length) === 1 ? '' : 's'}${nearMe ? ' near you' : ' available'}`}
       </p>
 
       {/* Category Pills */}
@@ -137,19 +145,25 @@ export default function BrowseProducts() {
       <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
         {products.map((p) => (
           <ProductCard 
-            key={p._id} 
+            key={`product-${p._id}`} 
             product={p} 
             onToggleWishlist={toggleWishlist} 
             isWishlisted={wishlist.includes(p._id)} 
           />
         ))}
-        {!loading && products.length === 0 && (
+        {notes.map((n) => (
+          <NoteCard 
+            key={`note-${n._id}`} 
+            note={n} 
+          />
+        ))}
+        {!loading && products.length === 0 && notes.length === 0 && (
           <p className="col-span-full py-16 text-center text-slate-400">No listings found — check back soon.</p>
         )}
       </div>
 
       {/* Optional Ad Unit */}
-      {!loading && products.length > 0 && (
+      {!loading && (products.length > 0 || notes.length > 0) && (
         <div className="mt-10">
           <AdUnit slot="5638179916" />
         </div>

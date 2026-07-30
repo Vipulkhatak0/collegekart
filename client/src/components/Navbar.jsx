@@ -26,12 +26,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const searchRef = useRef(null);
+  const inputRef = useRef(null);
 
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [scrolled, setScrolled] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Shrink + intensify blur/shadow once the page has scrolled a bit.
   useEffect(() => {
@@ -45,12 +46,19 @@ export default function Navbar() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchFocused(false);
+        setSearchOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Focus input automatically when search opens
+  useEffect(() => {
+    if (searchOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [searchOpen]);
 
   useEffect(() => {
     if (open) {
@@ -67,7 +75,7 @@ export default function Navbar() {
     e.preventDefault();
     navigate(search.trim() ? `/browse?search=${encodeURIComponent(search.trim())}` : '/browse');
     setSearch('');
-    setSearchFocused(false);
+    setSearchOpen(false);
   };
 
   const handleLogout = () => {
@@ -130,26 +138,45 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Search Bar */}
-        <form
-          ref={searchRef}
-          onSubmit={handleSearch}
-          onClick={() => setSearchFocused(true)}
-          className={`hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border bg-white/60 dark:bg-white/5 px-4 py-2 transition-all duration-200 cursor-text ${
-            searchFocused
-              ? 'border-primary-400 shadow-[0_0_0_4px_rgba(59,95,227,0.12)]'
-              : 'border-slate-200 dark:border-white/10'
-          }`}
-        >
-          <HiOutlineMagnifyingGlass className={`h-4 w-4 transition-colors ${searchFocused ? 'text-primary-500' : 'text-slate-400'}`} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            placeholder="Search for books, laptops, notes..."
-            className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-          /> 
-        </form>
+        {/* Expandable Search Icon/Bar */}
+        <div className="relative hidden md:flex items-center" ref={searchRef}>
+          {!searchOpen ? (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setSearchOpen(true)}
+              aria-label="Open search"
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+            >
+              <HiOutlineMagnifyingGlass className="h-5 w-5" />
+            </motion.button>
+          ) : (
+            <motion.form
+              initial={{ width: 40, opacity: 0 }}
+              animate={{ width: 300, opacity: 1 }}
+              exit={{ width: 40, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              onSubmit={handleSearch}
+              className="flex items-center gap-2 rounded-full border border-primary-400 bg-white/90 dark:bg-slate-900/90 px-4 py-2 shadow-[0_0_0_4px_rgba(59,95,227,0.12)] backdrop-blur-md"
+            >
+              <HiOutlineMagnifyingGlass className="h-4 w-4 text-primary-500 shrink-0" />
+              <input
+                ref={inputRef}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search for books, laptops, notes..."
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                <HiOutlineXMark className="h-4 w-4" />
+              </button>
+            </motion.form>
+          )}
+        </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-1.5 sm:gap-2">

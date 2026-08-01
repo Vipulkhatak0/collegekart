@@ -20,6 +20,8 @@ const navLinks = [
   { to: '/contact', label: 'Contact' }
 ];
 
+const easeOut = [0.16, 1, 0.3, 1];
+
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
@@ -34,7 +36,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Shrink + intensify blur/shadow once the page has scrolled a bit.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -42,7 +43,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Collapse search when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -53,7 +53,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Focus input automatically when search opens
   useEffect(() => {
     if (searchOpen && inputRef.current) {
       inputRef.current.focus();
@@ -61,14 +60,8 @@ export default function Navbar() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
   const handleSearch = (e) => {
@@ -86,51 +79,58 @@ export default function Navbar() {
 
   const isActive = (to) => location.pathname === to;
 
+  const iconButtonClass =
+    'rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white';
+
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`sticky top-0 z-40 border-b transition-all duration-300 ${
+      transition={{ duration: 0.35, ease: easeOut }}
+      className={`sticky top-0 z-40 border-b transition-shadow duration-300 ${
         scrolled
-          ? 'border-white/40 dark:border-white/10 bg-white/85 dark:bg-surface-dark/85 backdrop-blur-xl shadow-[0_4px_24px_-8px_rgba(59,95,227,0.25)]'
-          : 'border-white/20 dark:border-white/5 bg-white/70 dark:bg-surface-dark/70 backdrop-blur-xl'
+          ? 'border-slate-200/70 dark:border-white/10 bg-white/90 dark:bg-surface-dark/90 backdrop-blur-xl shadow-[0_1px_0_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.12)]'
+          : 'border-transparent bg-white/75 dark:bg-surface-dark/75 backdrop-blur-xl'
       }`}
     >
-      <div className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-3'}`}>
+      <div className={`mx-auto flex max-w-7xl items-center gap-3 px-4 sm:px-6 transition-[padding] duration-300 ${scrolled ? 'py-2.5' : 'py-3.5'}`}>
 
         {/* Logo */}
-        <Link to="/" className="group flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2.5 shrink-0">
           <motion.span
-            whileHover={{ rotate: -8, scale: 1.08 }}
-            whileTap={{ scale: 0.94 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-            className="relative grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-display text-lg font-bold text-white shadow-md shadow-primary-500/30"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-display text-lg font-bold text-white shadow-sm shadow-primary-500/30"
           >
             C
-            <span className="absolute inset-0 rounded-xl bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ mixBlendMode: 'overlay' }} />
           </motion.span>
-          <span className="font-display text-lg font-bold text-slate-800 dark:text-white">CollegeKart</span>
+          <span className="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+            CollegeKart
+          </span>
         </Link>
 
-        {/* Desktop Navigation with sliding active-tab indicator */}
-        <nav className="hidden lg:flex items-center gap-1 relative">
+        {/* Vertical divider */}
+        <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-white/10 mx-1" />
+
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0">
           {navLinks.map((l) => {
             const active = isActive(l.to);
             return (
               <NavLink
                 key={l.to}
                 to={l.to}
-                className="relative rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                className="relative rounded-full px-3.5 py-2 text-[13.5px] font-medium whitespace-nowrap transition-colors"
               >
                 {active && (
                   <motion.span
                     layoutId="nav-active-pill"
                     className="absolute inset-0 rounded-full bg-primary-50 dark:bg-white/10"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                   />
                 )}
-                <span className={`relative z-10 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-slate-600 hover:text-primary-500 dark:text-slate-300'}`}>
+                <span className={`relative z-10 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'}`}>
                   {l.label}
                 </span>
               </NavLink>
@@ -138,136 +138,139 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Expandable Search Icon/Bar */}
+        <div className="flex-1 lg:hidden" />
+
+        {/* Expandable Search */}
         <div className="relative hidden md:flex items-center" ref={searchRef}>
-          {!searchOpen ? (
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setSearchOpen(true)}
-              aria-label="Open search"
-              className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
-            >
-              <HiOutlineMagnifyingGlass className="h-5 w-5" />
-            </motion.button>
-          ) : (
-            <motion.form
-              initial={{ width: 40, opacity: 0 }}
-              animate={{ width: 300, opacity: 1 }}
-              exit={{ width: 40, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-              onSubmit={handleSearch}
-              className="flex items-center gap-2 rounded-full border border-primary-400 bg-white/90 dark:bg-slate-900/90 px-4 py-2 shadow-[0_0_0_4px_rgba(59,95,227,0.12)] backdrop-blur-md"
-            >
-              <HiOutlineMagnifyingGlass className="h-4 w-4 text-primary-500 shrink-0" />
-              <input
-                ref={inputRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for books, laptops, notes..."
-                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-              />
-              <button
-                type="button"
-                onClick={() => setSearchOpen(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+          <AnimatePresence initial={false} mode="wait">
+            {!searchOpen ? (
+              <motion.button
+                key="search-icon"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => setSearchOpen(true)}
+                aria-label="Open search"
+                className={iconButtonClass}
               >
-                <HiOutlineXMark className="h-4 w-4" />
-              </button>
-            </motion.form>
-          )}
+                <HiOutlineMagnifyingGlass className="h-5 w-5" />
+              </motion.button>
+            ) : (
+              <motion.form
+                key="search-field"
+                initial={{ width: 40, opacity: 0 }}
+                animate={{ width: 300, opacity: 1 }}
+                exit={{ width: 40, opacity: 0 }}
+                transition={{ duration: 0.25, ease: easeOut }}
+                onSubmit={handleSearch}
+                role="search"
+                className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/15 bg-white dark:bg-slate-900 px-3.5 py-2 shadow-sm ring-1 ring-primary-500/10 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/15"
+              >
+                <HiOutlineMagnifyingGlass className="h-4 w-4 text-slate-400 shrink-0" />
+                <input
+                  ref={inputRef}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search books, laptops, notes…"
+                  aria-label="Search CollegeKart"
+                  className="w-full bg-transparent text-sm text-slate-800 dark:text-white outline-none placeholder:text-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  aria-label="Close search"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <HiOutlineXMark className="h-4 w-4" />
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: theme === 'dark' ? 20 : -20 }}
-            whileTap={{ scale: 0.9 }}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+            className={iconButtonClass}
           >
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
                 key={theme}
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.15 }}
                 className="block"
               >
                 {theme === 'dark' ? <HiOutlineSun className="h-5 w-5" /> : <HiOutlineMoon className="h-5 w-5" />}
               </motion.span>
             </AnimatePresence>
-          </motion.button>
+          </button>
 
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="hidden sm:block">
-            <Link to="/wishlist" className="inline-flex rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10">
-              <HiOutlineHeart className="h-5 w-5" />
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="hidden sm:block">
-            <Link to="/chat" className="inline-flex rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10">
-              <HiOutlineChatBubbleLeftRight className="h-5 w-5" />
-            </Link>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            animate={{ rotate: [0, -12, 12, -8, 8, 0] }}
-            transition={{ rotate: { duration: 1.4, repeat: Infinity, repeatDelay: 4 } }}
-            className="hidden sm:block"
-          >
-            <Link to="/notifications" className="inline-flex rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10">
-              <HiOutlineBell className="h-5 w-5" />
-            </Link>
-          </motion.div>
+          <Link to="/wishlist" aria-label="Wishlist" className={`hidden sm:inline-flex ${iconButtonClass}`}>
+            <HiOutlineHeart className="h-5 w-5" />
+          </Link>
+          <Link to="/chat" aria-label="Messages" className={`hidden sm:inline-flex ${iconButtonClass}`}>
+            <HiOutlineChatBubbleLeftRight className="h-5 w-5" />
+          </Link>
+          <Link to="/notifications" aria-label="Notifications" className={`hidden sm:inline-flex ${iconButtonClass}`}>
+            <HiOutlineBell className="h-5 w-5" />
+          </Link>
+
+          {/* Divider before profile/login */}
+          <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-white/10 mx-1" />
 
           {/* User Profile Dropdown or Login */}
           {user ? (
             <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.94 }}
+              <button
                 onClick={() => setMenuOpen((v) => !v)}
+                aria-label="Account menu"
                 className="flex items-center gap-1 rounded-full p-1 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
               >
                 {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full object-cover" />
+                  <img src={user.avatar} alt={user.name} className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/10" />
                 ) : (
                   <HiOutlineUserCircle className="h-7 w-7" />
                 )}
-              </motion.button>
+              </button>
 
               <AnimatePresence>
                 {menuOpen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      initial={{ opacity: 0, scale: 0.97, y: -6 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-white/10 dark:bg-slate-900 z-20"
+                      exit={{ opacity: 0, scale: 0.97, y: -6 }}
+                      transition={{ duration: 0.15, ease: easeOut }}
+                      className="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-white/10 dark:bg-slate-900 z-20"
                     >
+                      <div className="px-3 py-2 border-b border-slate-100 dark:border-white/10 mb-1">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">{user.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                      </div>
                       <Link
                         to="/dashboard"
                         onClick={() => setMenuOpen(false)}
-                        className="flex w-full items-center rounded-lg px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                        className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       >
                         Dashboard
                       </Link>
                       <Link
                         to="/profile"
                         onClick={() => setMenuOpen(false)}
-                        className="flex w-full items-center rounded-lg px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                        className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       >
                         Profile
                       </Link>
                       <Link
                         to="/orders"
                         onClick={() => setMenuOpen(false)}
-                        className="flex w-full items-center rounded-lg px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                        className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       >
                         Orders
                       </Link>
@@ -275,41 +278,43 @@ export default function Navbar() {
                         <Link
                           to="/admin"
                           onClick={() => setMenuOpen(false)}
-                          className="flex w-full items-center rounded-lg px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                          className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                         >
                           Admin Panel
                         </Link>
                       )}
-                      <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                      >
-                        <HiOutlineArrowRightOnRectangle className="h-4 w-4" />
-                        Logout
-                      </button>
+                      <div className="border-t border-slate-100 dark:border-white/10 mt-1 pt-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <HiOutlineArrowRightOnRectangle className="h-4 w-4" />
+                          Logout
+                        </button>
+                      </div>
                     </motion.div>
                   </>
                 )}
               </AnimatePresence>
             </div>
           ) : (
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-              <Link to="/login" className="btn-primary !px-4 !py-2 text-xs">Login</Link>
-            </motion.div>
+            <Link to="/login" className="btn-primary !px-4 !py-2 text-xs">
+              Login
+            </Link>
           )}
 
           {/* Mobile Menu Trigger */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={() => setOpen(true)}
-            className="lg:hidden rounded-full p-2 text-slate-600 dark:text-slate-200"
+            aria-label="Open menu"
+            className={`lg:hidden ${iconButtonClass}`}
           >
             <HiOutlineBars3 className="h-6 w-6" />
-          </motion.button>
+          </button>
         </div>
       </div>
 
-      {/* Global Mobile Drawer */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {open && (
           <>
@@ -318,67 +323,66 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] lg:hidden"
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] lg:hidden"
             />
 
             <motion.aside
-              initial={{ x: "100%" }}
+              initial={{ x: '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.3, ease: easeOut }}
               className="fixed top-0 right-0 h-screen w-72 bg-white dark:bg-slate-900 shadow-2xl z-[9999] overflow-y-auto lg:hidden"
             >
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 p-4">
-                <h2 className="text-lg font-bold">Menu</h2>
-                <motion.button whileTap={{ scale: 0.9, rotate: 90 }} onClick={() => setOpen(false)}>
-                  <HiOutlineXMark className="h-6 w-6" />
-                </motion.button>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Menu</h2>
+                <button onClick={() => setOpen(false)} aria-label="Close menu">
+                  <HiOutlineXMark className="h-6 w-6 text-slate-500 dark:text-slate-300" />
+                </button>
               </div>
 
-              <div className="flex flex-col gap-1 p-4">
+              <div className="flex flex-col gap-0.5 p-3">
                 {[
                   ...navLinks,
-                  { to: "/wishlist", label: "Wishlist" },
-                  { to: "/chat", label: "Chat" },
-                  { to: "/dashboard", label: "Dashboard" },
-                  ...(user ? [{ to: "/profile", label: "Profile" }, { to: "/orders", label: "Orders" }] : []),
-                  ...(user?.role === 'admin' ? [{ to: "/admin", label: "Admin Panel" }] : []),
+                  { to: '/wishlist', label: 'Wishlist' },
+                  { to: '/chat', label: 'Chat' },
+                  { to: '/dashboard', label: 'Dashboard' },
+                  ...(user ? [{ to: '/profile', label: 'Profile' }, { to: '/orders', label: 'Orders' }] : []),
+                  ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
                 ].map((item, i) => (
                   <motion.div
                     key={item.to}
-                    initial={{ opacity: 0, x: 24 }}
+                    initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.04 * i, duration: 0.25 }}
+                    transition={{ delay: 0.03 * i, duration: 0.2, ease: easeOut }}
                   >
                     <Link
                       to={item.to}
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-all"
+                      className="block rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       {item.label}
                     </Link>
                   </motion.div>
                 ))}
 
-                {user ? (
-                  <button
-                    onClick={() => {
-                      setOpen(false);
-                      handleLogout();
-                    }}
-                    className="rounded-lg px-4 py-3 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    Logout
-                  </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    Login
-                  </Link>
-                )}
+                <div className="border-t border-slate-100 dark:border-white/10 mt-2 pt-2">
+                  {user ? (
+                    <button
+                      onClick={() => { setOpen(false); handleLogout(); }}
+                      className="w-full rounded-lg px-3.5 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      Login
+                    </Link>
+                  )}
+                </div>
               </div>
             </motion.aside>
           </>

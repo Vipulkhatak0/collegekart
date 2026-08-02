@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+impor { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar.jsx';

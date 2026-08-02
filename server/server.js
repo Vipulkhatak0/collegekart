@@ -17,7 +17,6 @@ import gigRoutes from './routes/gigRoutes.js';
 import premiumRoutes from './routes/premiumRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 
-
 const allowedOrigins = [
   'https://collegekart.shop',
   'https://www.collegekart.shop',
@@ -55,12 +54,14 @@ app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
 
-
 io.on('connection', (socket) => {
-  socket.on('join', (userId) => socket.join(userId));
-  socket.on('sendMessage', (message) => {
-    io.to(message.receiverId).emit('newMessage', message);
+  // Join user's personal room for targeted notifications & messages
+  socket.on('join', (userId) => {
+    if (userId) {
+      socket.join(String(userId));
+    }
   });
+
   socket.on('disconnect', () => {});
 });
 

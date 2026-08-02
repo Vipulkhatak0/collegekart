@@ -19,7 +19,6 @@ export default function EditGig() {
           category: g.category,
           price: g.price,
           deliveryDays: g.deliveryDays,
-          portfolioImage: g.portfolioImage || "",
         });
       })
       .catch((err) => toast.error(getErrorMessage(err)));
@@ -48,62 +47,75 @@ export default function EditGig() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
-          required
-        />
-        <textarea
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
-          rows={4}
-          required
-        />
-        <select
-          value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
-        >
-          <option value="assignment">Assignment</option>
-          <option value="project">Project</option>
-          <option value="presentation">Presentation</option>
-          <option value="typing">Typing</option>
-          <option value="design">Design</option>
-          <option value="coding">Coding</option>
-          <option value="other">Other</option>
-        </select>
-        <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Title</label>
           <input
-            type="number"
-            min="0"
-            placeholder="Price (₹)"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-            className="border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
-            required
-          />
-          <input
-            type="number"
-            min="1"
-            placeholder="Delivery days"
-            value={form.deliveryDays}
-            onChange={(e) => setForm({ ...form, deliveryDays: e.target.value })}
-            className="border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
             required
           />
         </div>
-        <input
-          placeholder="Portfolio image URL"
-          value={form.portfolioImage}
-          onChange={(e) => setForm({ ...form, portfolioImage: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
-        />
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Description</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
+            rows={4}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Category</label>
+          <select
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white capitalize"
+          >
+            <option value="assignment">Assignment</option>
+            <option value="project">Project</option>
+            <option value="presentation">Presentation</option>
+            <option value="typing">Typing</option>
+            <option value="design">Design</option>
+            <option value="coding">Coding</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Price (₹)</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="Price (₹)"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Delivery Days</label>
+            <input
+              type="number"
+              min="1"
+              placeholder="Delivery days"
+              value={form.deliveryDays}
+              onChange={(e) => setForm({ ...form, deliveryDays: e.target.value })}
+              className="w-full border rounded-lg px-3 py-2.5 dark:bg-white/5 dark:border-white/10 dark:text-white"
+              required
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-full bg-brand-gradient text-white py-3 font-semibold disabled:opacity-50"
+          className="w-full rounded-full bg-brand-gradient text-white py-3 font-semibold disabled:opacity-50 mt-2"
         >
           {submitting ? "Saving..." : "Save Changes"}
         </button>

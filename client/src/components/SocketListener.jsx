@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useGlobalSocket } from '../lib/useSocket';
-import { requestNotificationPermission } from '../services/notificationService';
+import { useAuth } from '@/context/AuthContext';
+import { useGlobalSocket } from '@/lib/useSocket';
+import { requestNotificationPermission } from '@/services/notificationService';
 
 export default function SocketListener() {
   const { currentUser } = useAuth();

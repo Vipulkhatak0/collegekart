@@ -54,6 +54,23 @@ router.get('/mine/list', protect, async (req, res) => {
   res.json({ products });
 });
 
+// @route GET /api/products/category-counts — live count of active listings per category
+router.get('/category-counts', async (req, res) => {
+  try {
+    const results = await Product.aggregate([
+      { $match: { status: 'active' } },
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+
+    const counts = {};
+    results.forEach((r) => { counts[r._id] = r.count; });
+
+    res.json({ counts });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch category counts.', error: err.message });
+  }
+});
+
 // @route GET /api/products/:id
 router.get('/:id', async (req, res) => {
   try {
@@ -141,7 +158,6 @@ router.post('/:id/report', protect, async (req, res) => {
 });
 
 // @route POST /api/products/ai/description
-// Stub — wire this to your AI provider (Anthropic/OpenAI) using AI_API_KEY from .env
 router.post('/ai/description', protect, async (req, res) => {
   const { title, category, condition } = req.body;
   const description = `${title} in ${condition?.toLowerCase() || 'good'} condition. Well maintained and ready for a new owner on campus.`;

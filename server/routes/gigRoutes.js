@@ -1,6 +1,7 @@
 import express from 'express';
 import Gig from '../models/Gig.js';
 import { protect } from '../middleware/auth.js';
+import { uploadGigImages } from '../config/cloudinary.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 
@@ -8,7 +9,6 @@ const router = express.Router();
 
 const isPremiumActive = (user) => user?.premiumExpiresAt && new Date(user.premiumExpiresAt) > new Date();
 
-// @route GET /api/gigs?category=
 router.get('/', async (req, res) => {
   try {
     const { category } = req.query;
@@ -47,11 +47,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, uploadGigImages.array('images', 4), async (req, res) => {
   try {
-    const { title, description, category, price, deliveryDays, portfolioImage } = req.body;
+    const { title, description, category, price, deliveryDays } = req.body;
+    const portfolioImages = (req.files || []).map((f) => f.path);
+
     const gig = await Gig.create({
-      title, description, category, price, deliveryDays, portfolioImage,
+      title, description, category, price, deliveryDays, portfolioImages,
       provider: req.user._id
     });
 
@@ -76,12 +78,20 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, uploadGigImages.array('images', 4), async (req, res) => {
   try {
     const gig = await Gig.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: 'Gig not found.' });
     if (String(gig.provider) !== String(req.user._id)) return res.status(403).json({ message: 'Not authorized.' });
-    Object.assign(gig, req.body);
+
+    const { title, description, category, price, deliveryDays, keepImages } = req.body;
+    const kept = keepImages ? JSON.parse(keepImages) : gig.portfolioImages;
+    const newUrls = (req.files || []).map((f) => f.path);
+
+    Object.assign(gig, {
+      title, description, category, price, deliveryDays,
+      portfolioImages: [...kept, ...newUrls].slice(0, 4)
+    });
     await gig.save();
     res.json({ gig });
   } catch (err) {

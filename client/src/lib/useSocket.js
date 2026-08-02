@@ -6,8 +6,13 @@ export function useGlobalSocket(currentUser) {
   useEffect(() => {
     if (!currentUser?._id) return;
 
-    const socketUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-    const socket = io(socketUrl);
+    // Automatically fall back to current domain if VITE_API_URL isn't set
+    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    
+    const socket = io(socketUrl, {
+      transports: ['polling', 'websocket'], // Ensures stable connection through proxies
+      secure: true,
+    });
 
     // Join personal socket room upon connection
     socket.emit('join', currentUser._id);
@@ -20,24 +25,28 @@ export function useGlobalSocket(currentUser) {
           duration: 4000,
         });
 
-        try {
-          const audio = new Audio('/notification-sound.mp3');
-          audio.play().catch(() => {});
-        } catch (e) {}
+        playChime();
       }
     });
 
     // Listen for live general notifications
     socket.on('newNotification', (notif) => {
       toast(notif.text, { icon: '🔔' });
-      try {
-        const audio = new Audio('/notification-sound.mp3');
-        audio.play().catch(() => {});
-      } catch (e) {}
+      playChime();
     });
 
     return () => {
       socket.disconnect();
     };
   }, [currentUser]);
+}
+
+// Safe audio trigger that bypasses browser autoplay blocking errors
+function playChime() {
+  try {
+    const audio = new Audio('/notification-sound.mp3');
+    audio.play().catch(() => {});
+  } catch (e) {
+    // Browsers block un-interacted audio, fail silently
+  }
 }

@@ -1,5 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
+import User from '../models/User.js';
+import Notification from '../models/Notification.js';
 import { protect } from '../middleware/auth.js';
 import { upload } from '../config/cloudinary.js';
 import { haversineKm } from '../utils/geo.js';
@@ -109,6 +111,32 @@ router.post('/', protect, upload.array('images', 6), async (req, res) => {
       req.user.phone = phone;
       await req.user.save();
     }
+
+    // Notify every admin with full poster details.
+    const admins = await User.find({ role: 'admin' }).select('_id');
+    const notifDocs = await Notification.insertMany(
+      admins.map((a) => ({
+        recipient: a._id,
+        type: 'new_product',
+        text: `${req.user.name} (${req.user.email}) listed a new product: "${title}"`,
+        link: `/product/${product._id}`,
+        meta: {
+          posterId: req.user._id,
+          posterName: req.user.name,
+          posterEmail: req.user.email,
+          posterPhone: phone,
+          productId: product._id,
+          category,
+          price
+        }
+      }))
+    );
+
+    const io = req.app.get('io');
+    notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+
+    // Lightweight broadcast so every connected client can show a "new listing" badge + sound.
+    io.emit('newListing', { productId: product._id, title: product.title, category: product.category });
 
     res.status(201).json({ product });
   } catch (err) {

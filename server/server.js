@@ -15,6 +15,7 @@ import serviceRequestRoutes from './routes/serviceRequestRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 import gigRoutes from './routes/gigRoutes.js';
 import premiumRoutes from './routes/premiumRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 
 const allowedOrigins = [
@@ -50,6 +51,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/gigs', gigRoutes);
 app.use('/api/premium', premiumRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
 

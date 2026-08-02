@@ -2,6 +2,8 @@ import express from 'express';
 import Note from '../models/Note.js';
 import { protect } from '../middleware/auth.js';
 import { uploadNote } from '../config/cloudinary.js';
+import User from '../models/User.js';
+import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
@@ -61,6 +63,21 @@ router.post('/', protect, uploadNote.single('file'), async (req, res) => {
       fileType,
       uploader: req.user._id
     });
+
+    const admins = await User.find({ role: 'admin' }).select('_id');
+    const notifDocs = await Notification.insertMany(
+      admins.map((a) => ({
+        recipient: a._id,
+        type: 'new_product',
+        text: `${req.user.name} (${req.user.email}) uploaded to Library: "${title}"`,
+        link: `/notes/${note._id}`,
+        meta: { posterId: req.user._id, posterName: req.user.name, posterEmail: req.user.email, noteId: note._id, type, college: req.user.college }
+      }))
+    );
+
+    const io = req.app.get('io');
+    notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+    io.emit('newListing', { productId: note._id, title: note.title, category: 'Library' });
 
     res.status(201).json({ note });
   } catch (err) {

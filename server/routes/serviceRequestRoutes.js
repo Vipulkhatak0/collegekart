@@ -2,6 +2,8 @@ import express from 'express';
 import ServiceRequest from '../models/ServiceRequest.js';
 import Bid from '../models/Bid.js';
 import { protect } from '../middleware/auth.js';
+import User from '../models/User.js';
+import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
@@ -42,11 +44,27 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', protect, async (req, res) => {
   try {
-    const { title, description, category, budget, deadline } = req.body;
+    const { title, description, category, budget, deadline, contactInfo } = req.body;
     const request = await ServiceRequest.create({
-      title, description, category, budget, deadline,
+      title, description, category, budget, deadline, contactInfo,
       buyer: req.user._id
     });
+
+    const admins = await User.find({ role: 'admin' }).select('_id');
+    const notifDocs = await Notification.insertMany(
+      admins.map((a) => ({
+        recipient: a._id,
+        type: 'new_product',
+        text: `${req.user.name} (${req.user.email}) posted a service request: "${title}"`,
+        link: `/services/${request._id}`,
+        meta: { posterId: req.user._id, posterName: req.user.name, posterEmail: req.user.email, requestId: request._id, category, budget }
+      }))
+    );
+
+    const io = req.app.get('io');
+    notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+    io.emit('newListing', { productId: request._id, title: request.title, category: 'Service Request' });
+
     res.status(201).json({ request });
   } catch (err) {
     res.status(500).json({ message: 'Failed to post request.', error: err.message });
@@ -55,15 +73,34 @@ router.post('/', protect, async (req, res) => {
 
 router.post('/:id/bids', protect, async (req, res) => {
   try {
-    const request = await ServiceRequest.findById(req.params.id);
+    const request = await ServiceRequest.findById(req.params.id).populate('buyer', 'name email');
     if (!request) return res.status(404).json({ message: 'Request not found.' });
     if (request.status !== 'open') return res.status(400).json({ message: 'This request is no longer open.' });
-    if (String(request.buyer) === String(req.user._id)) {
+    if (String(request.buyer._id) === String(req.user._id)) {
       return res.status(400).json({ message: 'You cannot bid on your own request.' });
     }
 
     const { price, message } = req.body;
     const bid = await Bid.create({ request: request._id, provider: req.user._id, price, message });
+
+    // Notify the service request buyer about the new bid
+    const notification = await Notification.create({
+      recipient: request.buyer._id,
+      type: 'new_bid',
+      text: `${req.user.name} placed a bid of ₹${price} on your service request: "${request.title}"`,
+      link: `/services/${request._id}`,
+      meta: {
+        providerId: req.user._id,
+        providerName: req.user.name,
+        requestId: request._id,
+        bidId: bid._id,
+        price
+      }
+    });
+
+    const io = req.app.get('io');
+    io.to(String(request.buyer._id)).emit('newNotification', notification);
+
     res.status(201).json({ bid });
   } catch (err) {
     res.status(500).json({ message: 'Failed to place bid.', error: err.message });
@@ -78,7 +115,7 @@ router.put('/:id/bids/:bidId/accept', protect, async (req, res) => {
       return res.status(403).json({ message: 'Only the request owner can accept a bid.' });
     }
 
-    const bid = await Bid.findById(req.params.bidId);
+    const bid = await Bid.findById(req.params.bidId).populate('provider', 'name email');
     if (!bid) return res.status(404).json({ message: 'Bid not found.' });
 
     bid.status = 'accepted';
@@ -92,6 +129,21 @@ router.put('/:id/bids/:bidId/accept', protect, async (req, res) => {
     request.status = 'assigned';
     request.acceptedBid = bid._id;
     await request.save();
+
+    // Notify the provider that their bid was accepted
+    const notification = await Notification.create({
+      recipient: bid.provider._id,
+      type: 'bid_accepted',
+      text: `Your bid of ₹${bid.price} for "${request.title}" was accepted!`,
+      link: `/services/${request._id}`,
+      meta: {
+        requestId: request._id,
+        bidId: bid._id
+      }
+    });
+
+    const io = req.app.get('io');
+    io.to(String(bid.provider._id)).emit('newNotification', notification);
 
     res.json({ message: 'Bid accepted.', request, bid });
   } catch (err) {
@@ -114,6 +166,21 @@ router.put('/:id/complete', protect, async (req, res) => {
   }
 });
 
+router.put('/:id/close', protect, async (req, res) => {
+  try {
+    const request = await ServiceRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found.' });
+    if (String(request.buyer) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Only the request owner can close this.' });
+    }
+    request.status = 'closed';
+    await request.save();
+    res.json({ request });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to close request.', error: err.message });
+  }
+});
+
 router.delete('/:id', protect, async (req, res) => {
   try {
     const request = await ServiceRequest.findById(req.params.id);
@@ -121,14 +188,14 @@ router.delete('/:id', protect, async (req, res) => {
     if (String(request.buyer) !== String(req.user._id) && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized.' });
     }
-    request.status = 'cancelled';
-    await request.save();
-    res.json({ message: 'Request cancelled.' });
+    await Bid.deleteMany({ request: request._id });
+    await request.deleteOne();
+    res.json({ message: 'Request deleted.' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to cancel request.', error: err.message });
+    res.status(500).json({ message: 'Failed to delete request.', error: err.message });
   }
 });
-// @route PUT /api/service-requests/:id — edit title/description/etc, owner only, only while open
+
 router.put('/:id', protect, async (req, res) => {
   try {
     const request = await ServiceRequest.findById(req.params.id);

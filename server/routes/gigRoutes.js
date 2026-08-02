@@ -1,6 +1,8 @@
 import express from 'express';
 import Gig from '../models/Gig.js';
 import { protect } from '../middleware/auth.js';
+import User from '../models/User.js';
+import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
@@ -17,7 +19,6 @@ router.get('/', async (req, res) => {
       .populate('provider', 'name avatar premiumExpiresAt sellerRating isSellerVerified')
       .sort({ createdAt: -1 });
 
-    // Featured (active premium) providers first, then most recent within each group.
     gigs.sort((a, b) => {
       const aPrem = isPremiumActive(a.provider) ? 1 : 0;
       const bPrem = isPremiumActive(b.provider) ? 1 : 0;
@@ -53,6 +54,22 @@ router.post('/', protect, async (req, res) => {
       title, description, category, price, deliveryDays, portfolioImage,
       provider: req.user._id
     });
+
+    const admins = await User.find({ role: 'admin' }).select('_id');
+    const notifDocs = await Notification.insertMany(
+      admins.map((a) => ({
+        recipient: a._id,
+        type: 'new_product',
+        text: `${req.user.name} (${req.user.email}) posted a new gig: "${title}"`,
+        link: `/gigs/${gig._id}`,
+        meta: { posterId: req.user._id, posterName: req.user.name, posterEmail: req.user.email, gigId: gig._id, category, price }
+      }))
+    );
+
+    const io = req.app.get('io');
+    notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+    io.emit('newListing', { productId: gig._id, title: gig.title, category: 'Gig' });
+
     res.status(201).json({ gig });
   } catch (err) {
     res.status(500).json({ message: 'Failed to create gig.', error: err.message });

@@ -11,7 +11,7 @@ const gigSchema = new mongoose.Schema(
     },
     price: { type: Number, required: true },
     deliveryDays: { type: Number, required: true },
-    portfolioImage: { type: String },
+    portfolioImages: [{ type: String }],
     provider: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['active', 'paused'], default: 'active' }
   },

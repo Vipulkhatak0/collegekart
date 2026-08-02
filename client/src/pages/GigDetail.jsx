@@ -45,8 +45,12 @@ export default function GigDetail() {
       </Link>
 
       <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/10 p-6">
-        {gig.portfolioImage && (
-          <img src={gig.portfolioImage} alt={gig.title} className="w-full h-56 object-cover rounded-xl mb-4" />
+        {gig.portfolioImages?.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {gig.portfolioImages.map((img, i) => (
+              <img key={i} src={img} alt="" className="w-full h-28 object-cover rounded-xl" />
+            ))}
+          </div>
         )}
 
         <div className="flex items-center justify-between flex-wrap gap-2">

@@ -13,8 +13,8 @@ export default function GigCard({ gig }) {
           : "border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5"
       }`}
     >
-      {gig.portfolioImage && (
-        <img src={gig.portfolioImage} alt={gig.title} className="w-full h-24 object-cover rounded-xl mb-3" />
+      {gig.portfolioImages?.[0] && (
+        <img src={gig.portfolioImages[0]} alt={gig.title} className="w-full h-24 object-cover rounded-xl mb-3" />
       )}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <span className="rounded-full bg-primary-50 dark:bg-white/10 text-primary-600 dark:text-primary-400 text-xs font-semibold px-2.5 py-1 capitalize">

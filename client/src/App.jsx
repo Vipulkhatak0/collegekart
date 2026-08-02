@@ -1,14 +1,13 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
-
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
 import Categories from './pages/Categories.jsx';
-
 import ProductDetails from './pages/ProductDetails.jsx';
 import SellProduct from './pages/SellProduct.jsx';
 import Wishlist from './pages/Wishlist.jsx';
@@ -36,7 +35,26 @@ import GigDetail from './pages/GigDetail.jsx';
 import EditServiceRequest from './pages/EditServiceRequest.jsx';
 import EditGig from './pages/EditGig.jsx';
 
+import { useGlobalSocket } from './lib/useSocket';
+import { requestNotificationPermission } from './services/notificationService';
+// If you use an auth context/hook, import it here:
+// import { useAuth } from './context/AuthContext';
+
 export default function App() {
+  // 1. Get the current logged-in user from your auth state/context
+  // const { currentUser } = useAuth(); 
+  
+  // Placeholder variable if you store user locally (replace with your actual auth hook source)
+  const currentUser = JSON.parse(localStorage.getItem('userInfo')) || null;
+
+  // 2. Initialize global socket listener for live instant messages & notifications
+  useGlobalSocket(currentUser);
+
+  // 3. Request background push/browser notification permissions on load
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-surface-light dark:bg-surface-dark">
       <Toaster position="top-center" />
@@ -48,8 +66,8 @@ export default function App() {
           <Route path="/browse" element={<BrowseProducts />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/gigs" element={<Gigs />} />
-<Route path="/gigs/:id" element={<GigDetail />} />
-         
+          <Route path="/gigs/:id" element={<GigDetail />} />
+          
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -58,13 +76,13 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/notes" element={<Notes />} />
-<Route path="/notes/:id" element={<NoteDetail />} />
-<Route path="/services" element={<ServiceRequests />} />
-<Route path="/services/:id" element={<ServiceRequestDetail />} />
+          <Route path="/notes/:id" element={<NoteDetail />} />
+          <Route path="/services" element={<ServiceRequests />} />
+          <Route path="/services/:id" element={<ServiceRequestDetail />} />
 
           {/* Protected Routes (Require Login) */}
           <Route path="/notes/upload" element={<UploadNote />} />
-<Route path="/services/post" element={<PostServiceRequest />} />
+          <Route path="/services/post" element={<PostServiceRequest />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/sell" element={<SellProduct />} />
             <Route path="/wishlist" element={<Wishlist />} />
@@ -76,7 +94,7 @@ export default function App() {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/gigs/post" element={<PostGig />} />
             <Route path="/services/:id/edit" element={<EditServiceRequest />} />
-<Route path="/gigs/:id/edit" element={<EditGig />} />
+            <Route path="/gigs/:id/edit" element={<EditGig />} />
           </Route>
         </Routes>
       </main>

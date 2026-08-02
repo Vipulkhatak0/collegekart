@@ -42,14 +42,11 @@ import { useAuth } from './context/AuthContext';
 export default function App() {
   const { currentUser } = useAuth(); 
 
-  // Initialize global socket listener for live instant messages & notifications
   useGlobalSocket(currentUser);
 
   useEffect(() => {
-    // Request background push/browser notification permissions
     requestNotificationPermission();
 
-    // Register PWA Service Worker for background push alerts and sound/vibration support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
@@ -65,13 +62,11 @@ export default function App() {
       <Navbar />
       <main className="flex-1">
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<BrowseProducts />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/gigs" element={<Gigs />} />
           <Route path="/gigs/:id" element={<GigDetail />} />
-          
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -84,7 +79,6 @@ export default function App() {
           <Route path="/services" element={<ServiceRequests />} />
           <Route path="/services/:id" element={<ServiceRequestDetail />} />
 
-          {/* Protected Routes (Require Login) */}
           <Route path="/notes/upload" element={<UploadNote />} />
           <Route path="/services/post" element={<PostServiceRequest />} />
           <Route element={<ProtectedRoute />}>

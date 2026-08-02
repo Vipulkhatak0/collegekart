@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import useAuth from '@/context/AuthContext';
 import { useGlobalSocket } from '@/lib/useSocket';
 import { requestNotificationPermission } from '@/services/notificationService';
 
 export default function SocketListener() {
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuth(); // AuthContext exposes `user`, not `currentUser`
   useGlobalSocket(currentUser);
 
   useEffect(() => {

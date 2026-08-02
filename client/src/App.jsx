@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import SocketListener from './components/SocketListener.jsx';
 
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
@@ -35,29 +35,10 @@ import GigDetail from './pages/GigDetail.jsx';
 import EditServiceRequest from './pages/EditServiceRequest.jsx';
 import EditGig from './pages/EditGig.jsx';
 
-import { useGlobalSocket } from './lib/useSocket';
-import { requestNotificationPermission } from './services/notificationService';
-import { useAuth } from './context/AuthContext.jsx';
-
 export default function App() {
-  const { currentUser } = useAuth(); 
-
-  useGlobalSocket(currentUser);
-
-  useEffect(() => {
-    requestNotificationPermission();
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-          .catch(err => console.error('Service Worker registration failed:', err));
-      });
-    }
-  }, []);
-
   return (
     <div className="flex min-h-screen flex-col bg-surface-light dark:bg-surface-dark">
+      <SocketListener />
       <Toaster position="top-center" />
       <Navbar />
       <main className="flex-1">

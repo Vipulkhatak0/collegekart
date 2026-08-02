@@ -37,22 +37,26 @@ import EditGig from './pages/EditGig.jsx';
 
 import { useGlobalSocket } from './lib/useSocket';
 import { requestNotificationPermission } from './services/notificationService';
-// If you use an auth context/hook, import it here:
-// import { useAuth } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 
 export default function App() {
-  // 1. Get the current logged-in user from your auth state/context
-  // const { currentUser } = useAuth(); 
-  
-  // Placeholder variable if you store user locally (replace with your actual auth hook source)
-  const currentUser = JSON.parse(localStorage.getItem('userInfo')) || null;
+  const { currentUser } = useAuth(); 
 
-  // 2. Initialize global socket listener for live instant messages & notifications
+  // Initialize global socket listener for live instant messages & notifications
   useGlobalSocket(currentUser);
 
-  // 3. Request background push/browser notification permissions on load
   useEffect(() => {
+    // Request background push/browser notification permissions
     requestNotificationPermission();
+
+    // Register PWA Service Worker for background push alerts and sound/vibration support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
   }, []);
 
   return (

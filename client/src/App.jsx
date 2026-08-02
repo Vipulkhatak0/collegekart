@@ -37,7 +37,7 @@ import EditGig from './pages/EditGig.jsx';
 
 import { useGlobalSocket } from './lib/useSocket';
 import { requestNotificationPermission } from './services/notificationService';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './context/AuthContext.jsx';
 
 export default function App() {
   const { currentUser } = useAuth(); 

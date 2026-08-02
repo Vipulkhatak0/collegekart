@@ -13,10 +13,47 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const { title, body, icon } = payload.notification || {};
+  const { title, body, icon, image } = payload.notification || {};
+  const data = payload.data || {};
 
-  self.registration.showNotification(title || "CollegeKart", {
-    body,
+  const notificationTitle = title || "CollegeKart Notification";
+  const notificationOptions = {
+    body: body || "You have a new update on CollegeKart!",
     icon: icon || "/logo192.png",
-  });
+    image: image,
+    // Vibrate pattern for mobile devices (vibrate, pause, vibrate)
+    vibrate: [200, 100, 200],
+    // Pass sound file path (fallback to standard audio asset if available)
+    data: { 
+      url: data.url || "/notifications",
+      sound: data.sound || "/notification-sound.mp3"
+    }
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  
+  const soundUrl = event.notification.data?.sound;
+  if (soundUrl) {
+    // Optional client-side sound execution on click if required
+    const audio = new Audio(soundUrl);
+    audio.play().catch(() => {});
+  }
+
+  const urlToOpen = event.notification.data?.url || "/notifications";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      for (let client of windowClients) {
+        if (client.url === urlToOpen && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
 });

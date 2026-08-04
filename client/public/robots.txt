@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://collegekart.shop/sitemap.xml

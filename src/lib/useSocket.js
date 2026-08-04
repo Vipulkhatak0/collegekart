@@ -6,12 +6,14 @@ export function useGlobalSocket(currentUser) {
   useEffect(() => {
     if (!currentUser?._id) return;
 
-    // Automatically fall back to current domain if VITE_API_URL isn't set
-    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    // Get the base API URL and clean up any trailing /api or spaces
+    let rawUrl = import.meta.env.VITE_API_URL || 'https://collegekart-server1.onrender.com';
+    const socketUrl = rawUrl.replace(/\/api\/?$/, '').trim();
     
     const socket = io(socketUrl, {
       transports: ['polling', 'websocket'], // Ensures stable connection through proxies
       secure: true,
+      withCredentials: true,
     });
 
     // Join personal socket room upon connection
@@ -19,8 +21,13 @@ export function useGlobalSocket(currentUser) {
 
     // Listen for incoming live messages
     socket.on('newMessage', (message) => {
-      if (message.receiver._id === currentUser._id && message.sender._id !== currentUser._id) {
-        toast.success(`${message.sender.name}: ${message.text}`, {
+      // Handle populated or raw ID fields safely
+      const receiverId = message.receiver?._id || message.receiver;
+      const senderId = message.sender?._id || message.sender;
+      const senderName = message.sender?.name || 'Someone';
+
+      if (receiverId === currentUser._id && senderId !== currentUser._id) {
+        toast.success(`${senderName}: ${message.text}`, {
           icon: '💬',
           duration: 4000,
         });
@@ -41,12 +48,14 @@ export function useGlobalSocket(currentUser) {
   }, [currentUser]);
 }
 
-// Safe audio trigger that bypasses browser autoplay blocking errors
+// Safe audio trigger using your public notification sound file
 function playChime() {
   try {
     const audio = new Audio('/notification-sound.mp3');
-    audio.play().catch(() => {});
+    audio.play().catch((err) => {
+      console.log('Audio autoplay prevented by browser policy until user interaction:', err);
+    });
   } catch (e) {
-    // Browsers block un-interacted audio, fail silently
+    // Fail silently if audio context is restricted
   }
 }

@@ -39,4 +39,13 @@ router.patch('/notifications/:id/read', protect, async (req, res) => {
   res.json({ success: true });
 });
 
+router.get('/notifications/unread-count', protect, async (req, res) => {
+  try {
+    const count = await Notification.countDocuments({ recipient: req.user._id, read: false });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch unread count.', error: err.message });
+  }
+});
+
 export default router;

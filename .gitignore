@@ -11,3 +11,5 @@ client/build/
 npm-debug.log*
 .DS_Store
 Thumbs.db
+
+client/server/

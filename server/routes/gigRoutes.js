@@ -4,6 +4,7 @@ import { protect } from '../middleware/auth.js';
 import { uploadGigImages } from '../config/cloudinary.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
+import { sendPushToAll, sendPushToUsers } from '../utils/sendPush.js';
 
 const router = express.Router();
 
@@ -70,6 +71,27 @@ router.post('/', protect, uploadGigImages.array('images', 4), async (req, res) =
 
     const io = req.app.get('io');
     notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+
+    // Push notification to all users (works even if they're offline/app closed)
+    await sendPushToAll(
+      {
+        title: "New Gig Posted 🎉",
+        body: `${gig.title} — check it out on collegekart.shop!`,
+        url: `/gigs/${gig._id}`
+      },
+      req.user._id
+    );
+
+    // Push notification specifically to admins
+    await sendPushToUsers(
+      admins.map((a) => a._id),
+      {
+        title: "New Gig to Review",
+        body: `${req.user.name} posted a gig: "${gig.title}"`,
+        url: `/gigs/${gig._id}`
+      }
+    );
+
     io.emit('newListing', { productId: gig._id, title: gig.title, category: 'Gig' });
 
     res.status(201).json({ gig });

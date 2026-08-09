@@ -4,6 +4,7 @@ import Bid from '../models/Bid.js';
 import { protect } from '../middleware/auth.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
+import { sendPushToAll, sendPushToUsers } from '../utils/sendPush.js';
 
 const router = express.Router();
 
@@ -63,6 +64,27 @@ router.post('/', protect, async (req, res) => {
 
     const io = req.app.get('io');
     notifDocs.forEach((n) => io.to(String(n.recipient)).emit('newNotification', n));
+
+    // Push notification to all users (works even if they're offline/app closed)
+    await sendPushToAll(
+      {
+        title: "New Service Request Posted 🎉",
+        body: `${request.title} — check it out on collegekart.shop!`,
+        url: `/services/${request._id}`
+      },
+      req.user._id
+    );
+
+    // Push notification specifically to admins
+    await sendPushToUsers(
+      admins.map((a) => a._id),
+      {
+        title: "New Service Request to Review",
+        body: `${req.user.name} posted: "${request.title}"`,
+        url: `/services/${request._id}`
+      }
+    );
+
     io.emit('newListing', { productId: request._id, title: request.title, category: 'Service Request' });
 
     res.status(201).json({ request });
@@ -100,6 +122,15 @@ router.post('/:id/bids', protect, async (req, res) => {
 
     const io = req.app.get('io');
     io.to(String(request.buyer._id)).emit('newNotification', notification);
+
+    await sendPushToUsers(
+      [request.buyer._id],
+      {
+        title: "New Bid Received",
+        body: `${req.user.name} placed a bid of ₹${price} on "${request.title}"`,
+        url: `/services/${request._id}`
+      }
+    );
 
     res.status(201).json({ bid });
   } catch (err) {
@@ -144,6 +175,15 @@ router.put('/:id/bids/:bidId/accept', protect, async (req, res) => {
 
     const io = req.app.get('io');
     io.to(String(bid.provider._id)).emit('newNotification', notification);
+
+    await sendPushToUsers(
+      [bid.provider._id],
+      {
+        title: "Bid Accepted! 🎉",
+        body: `Your bid of ₹${bid.price} for "${request.title}" was accepted!`,
+        url: `/services/${request._id}`
+      }
+    );
 
     res.json({ message: 'Bid accepted.', request, bid });
   } catch (err) {

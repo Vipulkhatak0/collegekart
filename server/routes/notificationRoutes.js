@@ -35,7 +35,7 @@ router.get('/notifications', protect, async (req, res) => {
 });
 
 router.patch('/notifications/:id/read', protect, async (req, res) => {
-  await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
+  await Notification.findByIdAndUpdate(req.params.id, { read: true });
   res.json({ success: true });
 });
 

@@ -3,7 +3,7 @@ import Message from '../models/Message.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import { protect } from '../middleware/auth.js';
-import { sendPushNotification } from '../utils/sendPush.js';
+import { sendPushToUsers } from '../utils/sendPush.js';
 
 const router = express.Router();
 
@@ -62,14 +62,11 @@ router.post('/', protect, async (req, res) => {
     io.to(String(receiverId)).emit('newNotification', notification);
 
     // Mobile push notification via Firebase (fires even if the receiver's app is closed/backgrounded)
-    const receiverUser = await User.findById(receiverId);
-    if (receiverUser?.fcmToken) {
-      await sendPushNotification(receiverUser.fcmToken, {
-        title: `New message from ${req.user.name}`,
-        body: preview,
-        url: `/chat?with=${req.user._id}`,
-      });
-    }
+    await sendPushToUsers([receiverId], {
+      title: `New message from ${req.user.name}`,
+      body: preview,
+      url: `/chat?with=${req.user._id}`,
+    });
 
     res.status(201).json({ message });
   } catch (err) {

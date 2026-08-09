@@ -4,7 +4,6 @@ import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import SocketListener from './components/SocketListener.jsx';
-import PushNotificationListener from './components/PushNotificationListener.jsx';
 
 import Home from './pages/Home.jsx';
 import BrowseProducts from './pages/BrowseProducts.jsx';
@@ -40,7 +39,6 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-surface-light dark:bg-surface-dark">
       <SocketListener />
-      <PushNotificationListener />
       <Toaster position="top-center" />
       <Navbar />
       <main className="flex-1">

@@ -1,6 +1,6 @@
 import { getToken } from "firebase/messaging";
 import { messaging } from "../firebase";
-import api from "../lib/api"; // Your existing Axios instance
+import api from "../lib/api";
 
 export async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -15,7 +15,7 @@ export async function requestNotificationPermission() {
     console.log("FCM Token:", token);
 
     if (token) {
-      await api.post("/users/fcm-token", { fcmToken: token });
+      await api.post("/notifications/fcm-token", { token });
     }
 
     return token;

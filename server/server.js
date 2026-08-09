@@ -50,7 +50,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/gigs', gigRoutes);
 app.use('/api/premium', premiumRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('/api', notificationRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'CollegeKart API is running' }));
 

@@ -5,6 +5,7 @@ import Notification from '../models/Notification.js';
 import { protect } from '../middleware/auth.js';
 import { upload } from '../config/cloudinary.js';
 import { haversineKm } from '../utils/geo.js';
+import { sendPushToAll, sendPushToUsers } from '../utils/sendPush.js';
 
 const router = express.Router();
 
@@ -106,6 +107,16 @@ router.post('/', protect, upload.array('images', 6), async (req, res) => {
       }
     });
 
+    // Push notification to all users' phones (works even if they're offline/app closed)
+    await sendPushToAll(
+      {
+        title: "New Product Listed 🎉",
+        body: `${product.title} was just added on CollegeKart!`,
+        url: `/product/${product._id}`
+      },
+      req.user._id
+    );
+
     // Keep the seller's profile phone in sync so future listings can prefill it.
     if (!req.user.phone) {
       req.user.phone = phone;
@@ -137,6 +148,15 @@ router.post('/', protect, upload.array('images', 6), async (req, res) => {
 
     // Lightweight broadcast so every connected client can show a "new listing" badge + sound.
     io.emit('newListing', { productId: product._id, title: product.title, category: product.category });
+
+    await sendPushToUsers(
+      admins.map((a) => a._id),
+      {
+        title: "New Listing to Review",
+        body: `${req.user.name} listed "${product.title}" — tap to review.`,
+        url: `/product/${product._id}`
+      }
+    );
 
     res.status(201).json({ product });
   } catch (err) {
@@ -199,5 +219,5 @@ router.post('/ai/price-suggestion', protect, async (req, res) => {
   const avg = similar.length ? Math.round(similar.reduce((a, p) => a + p.price, 0) / similar.length) : 1000;
   res.json({ suggestedPrice: avg });
 });
-
+    
 export default router;

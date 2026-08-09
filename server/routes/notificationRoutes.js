@@ -1,36 +1,42 @@
 import express from 'express';
-import Notification from '../models/Notification.js';
 import { protect } from '../middleware/auth.js';
+import UserToken from '../models/UserToken.js';
+import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
-// @route GET /api/notifications
-router.get('/', protect, async (req, res) => {
-  const notifications = await Notification.find({ recipient: req.user._id }).sort({ createdAt: -1 }).limit(100);
-  res.json({ notifications });
+// Save/update this logged-in user's FCM device token
+router.post('/notifications/fcm-token', protect, async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ message: 'Token is required.' });
+
+    await UserToken.findOneAndUpdate(
+      { userId: req.user._id },
+      { fcmToken: token },
+      { upsert: true, new: true }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to save token.', error: err.message });
+  }
 });
 
-// @route GET /api/notifications/unread-count
-router.get('/unread-count', protect, async (req, res) => {
-  const count = await Notification.countDocuments({ recipient: req.user._id, read: false });
-  res.json({ count });
+// Fetch this user's notifications (for your existing /notifications page)
+router.get('/notifications', protect, async (req, res) => {
+  try {
+    const notifs = await Notification.find({ recipient: req.user._id }).sort({ createdAt: -1 }).limit(50);
+    res.json({ notifications: notifs });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch notifications.', error: err.message });
+  }
 });
 
-// @route PUT /api/notifications/:id/read
-router.put('/:id/read', protect, async (req, res) => {
-  const notification = await Notification.findOneAndUpdate(
-    { _id: req.params.id, recipient: req.user._id },
-    { read: true },
-    { new: true }
-  );
-  if (!notification) return res.status(404).json({ message: 'Notification not found.' });
-  res.json({ notification });
-});
-
-// @route PUT /api/notifications/read-all
-router.put('/read-all', protect, async (req, res) => {
-  await Notification.updateMany({ recipient: req.user._id, read: false }, { read: true });
-  res.json({ message: 'All notifications marked as read.' });
+router.patch('/notifications/:id/read', protect, async (req, res) => {
+  await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
+  res.json({ success: true });
 });
 
 export default router;

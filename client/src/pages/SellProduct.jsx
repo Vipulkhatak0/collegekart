@@ -50,20 +50,20 @@ export default function SellProduct() {
     }
   };
 
- const useMyLocation = async () => {
-  setLocating(true);
-  try {
-    const pos = await getCurrentPosition();
-    setCoords(pos);
-    const placeName = await reverseGeocode(pos.lat, pos.lng);
-    if (placeName) setAddress(placeName);
-    toast.success('Location captured! Buyers nearby will see this listing first.');
-  } catch {
-    toast.error('Could not access your location. You can still enter an address manually.');
-  } finally {
-    setLocating(false);
-  }
-};
+  const useMyLocation = async () => {
+    setLocating(true);
+    try {
+      const pos = await getCurrentPosition();
+      setCoords(pos);
+      const placeName = await reverseGeocode(pos.lat, pos.lng);
+      if (placeName) setAddress(placeName);
+      toast.success('Location captured! Buyers nearby will see this listing first.');
+    } catch {
+      toast.error('Could not access your location. You can still enter an address manually.');
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const handleFiles = (e) => {
     const selected = Array.from(e.target.files || []).slice(0, 6);
@@ -75,7 +75,7 @@ export default function SellProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (files.length === 0) return toast.error('Add at least one photo.');
-    if (!phone.trim()) return toast.error('A contact phone number is required, .');
+    if (!phone.trim()) return toast.error('A contact phone number is required.');
     if (!address.trim()) return toast.error('Add your pickup location / hostel block.');
 
     setSubmitting(true);
@@ -115,7 +115,7 @@ export default function SellProduct() {
 
         <div>
           <label className="text-sm font-medium">Category</label>
-         <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field mt-1.5" style={{ colorScheme: 'dark light' }} required>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field mt-1.5" style={{ colorScheme: 'dark light' }} required>
             <option value="" disabled>Select a category</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -123,7 +123,7 @@ export default function SellProduct() {
 
         <div>
           <label className="text-sm font-medium">Condition</label>
-        <select value={condition} onChange={(e) => setCondition(e.target.value)} className="input-field mt-1.5" style={{ colorScheme: 'dark light' }}>
+          <select value={condition} onChange={(e) => setCondition(e.target.value)} className="input-field mt-1.5" style={{ colorScheme: 'dark light' }}>
             <option>Like New</option>
             <option>Good</option>
             <option>Fair</option>
@@ -163,24 +163,24 @@ export default function SellProduct() {
         </div>
 
         <div>
-  <button type="button" onClick={useMyLocation} disabled={locating} className="flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 disabled:opacity-60">
-    <HiOutlineMapPin className="h-4 w-4" /> {locating ? 'Locating...' : coords ? 'Location pinned ✓' : 'Use my current location'}
-  </button>
-  <p className="mt-1 text-[11px] text-slate-400">Pinning your exact location lets nearby students find this in "Near Me" search.</p>
+          <button type="button" onClick={useMyLocation} disabled={locating} className="flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 disabled:opacity-60">
+            <HiOutlineMapPin className="h-4 w-4" /> {locating ? 'Locating...' : coords ? 'Location pinned ✓' : 'Use my current location'}
+          </button>
+          <p className="mt-1 text-[11px] text-slate-400">Pinning your exact location lets nearby students find this in "Near Me" search.</p>
 
-  {coords && (
-    <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 dark:border-white/10">
-      <iframe
-        title="Your pinned location"
-        width="100%"
-        height="180"
-        style={{ border: 0 }}
-        loading="lazy"
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lng - 0.01}%2C${coords.lat - 0.01}%2C${coords.lng + 0.01}%2C${coords.lat + 0.01}&layer=mapnik&marker=${coords.lat}%2C${coords.lng}`}
-      />
-    </div>
-  )}
-</div>
+          {coords && (
+            <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 dark:border-white/10">
+              <iframe
+                title="Your pinned location"
+                width="100%"
+                height="180"
+                style={{ border: 0 }}
+                loading="lazy"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lng - 0.01}%2C${coords.lat - 0.01}%2C${coords.lng + 0.01}%2C${coords.lat + 0.01}&layer=mapnik&marker=${coords.lat}%2C${coords.lng}`}
+              />
+            </div>
+          )}
+        </div>
 
         <div>
           <label className="text-sm font-medium">Photos</label>

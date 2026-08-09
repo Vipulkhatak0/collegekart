@@ -72,5 +72,14 @@ router.get('/:id', async (req, res) => {
     res.status(404).json({ message: 'User not found.' });
   }
 });
+router.post('/fcm-token', protect, async (req, res) => {
+  try {
+    const { fcmToken } = req.body;
+    await User.findByIdAndUpdate(req.user._id, { fcmToken });
+    res.json({ message: 'FCM token saved.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to save FCM token.', error: err.message });
+  }
+});
 
 export default router;

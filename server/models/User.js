@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema(
     sellerRating: { type: Number, default: 0 },
     isSellerVerified: { type: Boolean, default: false },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    premiumExpiresAt: { type: Date, default: null }
+    premiumExpiresAt: { type: Date, default: null },
+    fcmToken: { type: String, default: null }
   },
   { timestamps: true }
 );

@@ -34,6 +34,25 @@ router.get('/notifications', protect, async (req, res) => {
   }
 });
 
+// Mark all as read must come before /:id routes to avoid route collision
+router.put('/notifications/read-all', protect, async (req, res) => {
+  try {
+    await Notification.updateMany({ recipient: req.user._id, read: false }, { read: true });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to mark all as read.', error: err.message });
+  }
+});
+
+router.put('/notifications/:id/read', protect, async (req, res) => {
+  try {
+    await Notification.findByIdAndUpdate(req.params.id, { read: true });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to mark as read.', error: err.message });
+  }
+});
+
 router.patch('/notifications/:id/read', protect, async (req, res) => {
   await Notification.findByIdAndUpdate(req.params.id, { read: true });
   res.json({ success: true });

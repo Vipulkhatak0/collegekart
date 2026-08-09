@@ -16,6 +16,18 @@ export function useGlobalSocket(currentUser) {
       withCredentials: true,
     });
 
+    socket.on('connect', () => {
+      console.log('✅ Global socket connected:', socket.id);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log('❌ Global socket disconnected:', reason);
+    });
+
+    socket.on('connect_error', (err) => {
+      console.log('⚠️ Global socket connection error:', err.message);
+    });
+
     // Join personal socket room upon connection
     socket.emit('join', currentUser._id);
 

@@ -13,8 +13,27 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: "/icon-192.png"
+  const data = payload.data || {};
+  const title = payload.notification?.title || data.title || 'CollegeKart Notification';
+
+  self.registration.showNotification(title, {
+    body: payload.notification?.body || data.body || 'You have a new update on CollegeKart!',
+    icon: '/icon-192.png',
+    vibrate: [200, 100, 200],
+    data: { url: payload.notification?.click_action || data.url || '/notifications' }
   });
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  const url = event.notification.data?.url || '/notifications';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url === url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
 });

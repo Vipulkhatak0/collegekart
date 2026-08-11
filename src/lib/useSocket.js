@@ -54,6 +54,15 @@ export function useGlobalSocket(currentUser) {
       playChime();
     });
 
+    // Listen for site-wide "new listing" broadcasts (products, gigs, service requests)
+    socket.on('newListing', (listing) => {
+      toast(`New ${listing.category || 'listing'}: ${listing.title} — check it out!`, {
+        icon: '🛍️',
+        duration: 4000,
+      });
+      playChime();
+    });
+
     return () => {
       socket.disconnect();
     };

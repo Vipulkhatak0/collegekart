@@ -9,13 +9,19 @@ export default function Contact() {
       <div>
         <span className="section-eyebrow">Get in touch</span>
         <h1 className="mt-2 font-display text-2xl font-bold">Contact Us</h1>
-        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">Have a question, found a bug, or want to partner with us? Reach out.</p>
+        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+          CollegeKart is built and maintained by a single student developer, so every message actually gets read personally. Found a bug, have a feature idea, spotted a suspicious listing, or just want to say hi — reach out below and I'll get back to you, usually within a day or two.
+        </p>
 
         <div className="mt-6 space-y-4 text-sm">
-          <p className="flex items-center gap-2"><HiOutlineEnvelope className="h-4 w-4 text-primary-500" /> collegkart394@gamil.com</p>
-          <p className="flex items-center gap-2"><HiOutlinePhone className="h-4 w-4 text-primary-500" /> +91 000000000</p>
-          <p className="flex items-center gap-2"><HiOutlineMapPin className="h-4 w-4 text-primary-500" /> Student Innovation Hub, Campus Road</p>
+          <p className="flex items-center gap-2"><HiOutlineEnvelope className="h-4 w-4 text-primary-500" /> collegekart394@gmail.com</p>
+          <p className="flex items-center gap-2"><HiOutlinePhone className="h-4 w-4 text-primary-500" /> +91 81950 52708</p>
+          <p className="flex items-center gap-2"><HiOutlineMapPin className="h-4 w-4 text-primary-500" /> Ludhiana, Punjab, India</p>
         </div>
+
+        <p className="mt-6 text-xs text-slate-400">
+          For account or listing issues, you can also use the "Report" button directly on any listing for the fastest response.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="glass-card space-y-4 p-6">

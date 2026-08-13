@@ -5,56 +5,57 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    color-scheme: light;
-  }
-  html.dark {
     color-scheme: dark;
   }
+  
   body {
-    @apply text-slate-800 dark:text-slate-100;
+    background-color: #000000;
+    @apply text-white;
   }
+
   h1, h2, h3, h4 {
-    @apply font-display;
+    @apply font-display text-white;
   }
+
   :focus-visible {
-    outline: 2px solid #3B5FE3;
+    outline: 2px solid #ffffff;
     outline-offset: 2px;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply relative rounded-card border border-white/40 dark:border-white/10
-           bg-white/60 dark:bg-surface-darkCard/60 backdrop-blur-xl
-           shadow-glass dark:shadow-glass-dark transition-all duration-300;
+    @apply relative rounded-card border border-white/10
+           bg-neutral-900/80 backdrop-blur-xl
+           shadow-2xl transition-all duration-300;
   }
 
   .glass-card:hover {
-    @apply -translate-y-1 shadow-lg;
+    @apply -translate-y-1 border-white/30 shadow-2xl;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient
-           px-6 py-3 text-sm font-semibold text-white shadow-md transition-transform
-           duration-200 hover:scale-[1.03] active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-white
+           px-6 py-3 text-sm font-semibold text-black shadow-md transition-transform
+           duration-200 hover:bg-neutral-200 hover:scale-[1.03] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary-500/30
-           px-6 py-3 text-sm font-semibold text-primary-600 dark:text-primary-400
-           bg-white/50 dark:bg-white/5 backdrop-blur-md transition-all duration-200
-           hover:bg-primary-50 dark:hover:bg-white/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/20
+           px-6 py-3 text-sm font-semibold text-white
+           bg-neutral-900 backdrop-blur-md transition-all duration-200
+           hover:bg-neutral-800 hover:border-white/40;
   }
 
   .input-field {
-    @apply w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white/70
-           dark:bg-white/5 px-4 py-3 text-sm placeholder:text-slate-400
-           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition
-           dark:[color-scheme:dark];
+    @apply w-full rounded-xl border border-white/10 bg-neutral-900/70
+           px-4 py-3 text-sm text-white placeholder:text-neutral-500
+           focus:border-white focus:ring-2 focus:ring-white/20 outline-none transition
+           [color-scheme:dark];
   }
 
   .section-eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.2em] text-primary-500 dark:text-primary-400;
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-neutral-400;
   }
 
   /* Signature: campus ID-card notch on product cards */

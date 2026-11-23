@@ -60,9 +60,9 @@ export default function App() {
           <Route path="/services" element={<ServiceRequests />} />
           <Route path="/services/:id" element={<ServiceRequestDetail />} />
 
+          <Route path="/notes/upload" element={<UploadNote />} />
           <Route path="/services/post" element={<PostServiceRequest />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/notes/upload" element={<UploadNote />} />
             <Route path="/sell" element={<SellProduct />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/chat" element={<Chat />} />

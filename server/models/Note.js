@@ -20,8 +20,6 @@ const noteSchema = new mongoose.Schema(
     },
     fileUrl: { type: String, required: true },
     fileType: { type: String, required: true },
-    fileName: { type: String, trim: true },
-    fileSize: { type: Number },
     price: { type: Number, default: 0 },
     uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     downloadCount: { type: Number, default: 0 }

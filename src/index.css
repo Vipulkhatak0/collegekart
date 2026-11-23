@@ -11,50 +11,50 @@
     color-scheme: dark;
   }
   body {
-    @apply bg-[#F6F7F9] text-[#17212F] dark:text-slate-100;
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    @apply text-slate-800 dark:text-slate-100;
   }
   h1, h2, h3, h4 {
     @apply font-display;
   }
   :focus-visible {
-    outline: 2px solid #3768A6;
+    outline: 2px solid #3B5FE3;
     outline-offset: 2px;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply relative rounded-md border border-slate-200 dark:border-white/10
-           bg-white dark:bg-surface-darkCard shadow-sm transition-shadow duration-200;
+    @apply relative rounded-card border border-white/40 dark:border-white/10
+           bg-white/60 dark:bg-surface-darkCard/60 backdrop-blur-xl
+           shadow-glass dark:shadow-glass-dark transition-all duration-300;
   }
 
   .glass-card:hover {
-    @apply shadow-md;
+    @apply -translate-y-1 shadow-lg;
   }
 
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#142B4A]
-           px-5 py-2.5 text-sm font-semibold text-white transition-colors
-           duration-200 hover:bg-[#203e62] active:bg-[#0c1b2e];
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient
+           px-6 py-3 text-sm font-semibold text-white shadow-md transition-transform
+           duration-200 hover:scale-[1.03] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-slate-300
-           px-5 py-2.5 text-sm font-semibold text-[#142B4A] dark:text-primary-400
-           bg-white dark:bg-white/5 transition-colors duration-200
-           hover:border-[#3768A6] hover:bg-slate-50 dark:hover:bg-white/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary-500/30
+           px-6 py-3 text-sm font-semibold text-primary-600 dark:text-primary-400
+           bg-white/50 dark:bg-white/5 backdrop-blur-md transition-all duration-200
+           hover:bg-primary-50 dark:hover:bg-white/10;
   }
 
   .input-field {
-    @apply w-full rounded-md border border-slate-200 dark:border-white/10 bg-white
-           dark:bg-white/5 px-3 py-2.5 text-sm placeholder:text-slate-400
+    @apply w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white/70
+           dark:bg-white/5 px-4 py-3 text-sm placeholder:text-slate-400
            focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition
            dark:[color-scheme:dark];
   }
 
   .section-eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.14em] text-[#3768A6] dark:text-primary-400;
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-primary-500 dark:text-primary-400;
   }
 
   /* Signature: campus ID-card notch on product cards */

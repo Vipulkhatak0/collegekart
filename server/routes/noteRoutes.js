@@ -4,6 +4,7 @@ import { protect } from '../middleware/auth.js';
 import { uploadNote } from '../config/cloudinary.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
+import { Readable } from 'node:stream';
 
 const router = express.Router();
 
@@ -61,6 +62,8 @@ router.post('/', protect, uploadNote.single('file'), async (req, res) => {
       price: price ? Number(price) : 0,
       fileUrl: req.file.path,
       fileType,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
       uploader: req.user._id
     });
 
@@ -87,11 +90,39 @@ router.post('/', protect, uploadNote.single('file'), async (req, res) => {
 
 router.post('/:id/download', protect, async (req, res) => {
   try {
-    const note = await Note.findByIdAndUpdate(req.params.id, { $inc: { downloadCount: 1 } }, { new: true });
+    const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ message: 'Note not found.' });
-    res.json({ fileUrl: note.fileUrl });
+    if (note.price > 0) return res.status(403).json({ message: 'This resource is not available for free download.' });
+    if (!note.fileUrl) return res.status(404).json({ message: 'The file is unavailable.' });
+
+    let fileUrl;
+    try {
+      fileUrl = new URL(note.fileUrl);
+    } catch {
+      return res.status(404).json({ message: 'The file URL is invalid.' });
+    }
+    if (!/^([a-z0-9-]+\.)*cloudinary\.com$/i.test(fileUrl.hostname) || fileUrl.protocol !== 'https:') {
+      return res.status(502).json({ message: 'The stored file provider is not supported.' });
+    }
+
+    const upstream = await fetch(fileUrl, { redirect: 'error' });
+    if (!upstream.ok || !upstream.body) {
+      return res.status(502).json({ message: 'The file could not be retrieved. Please try again later.' });
+    }
+
+    const originalName = note.fileName || `${note.title}.${note.fileType || 'file'}`;
+    const safeName = originalName.replace(/[\\/\r\n"\0]/g, '_').trim() || `collegekart-note.${note.fileType || 'file'}`;
+    const fallbackName = safeName.replace(/[^\x20-\x7E]/g, '_').replace(/"/g, "'");
+    res.setHeader('Content-Disposition', `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`);
+    res.setHeader('Content-Type', upstream.headers.get('content-type') || 'application/octet-stream');
+    const contentLength = upstream.headers.get('content-length');
+    if (contentLength) res.setHeader('Content-Length', contentLength);
+
+    await Note.updateOne({ _id: note._id }, { $inc: { downloadCount: 1 } });
+    Readable.fromWeb(upstream.body).on('error', () => res.destroy()).pipe(res);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to process download.', error: err.message });
+    if (!res.headersSent) res.status(500).json({ message: 'Failed to prepare the download. Please try again.' });
+    else res.destroy(err);
   }
 });
 

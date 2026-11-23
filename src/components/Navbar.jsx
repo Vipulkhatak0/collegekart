@@ -12,15 +12,13 @@ import useAuth from '../context/AuthContext.jsx';
 import api, { SOCKET_URL } from '../lib/api.js';
 
 const navLinks = [
+  { to: '/', label: 'Home' },
   { to: '/browse', label: 'Browse' },
   { to: '/categories', label: 'Categories' },
-  { to: '/student-essentials', label: 'Essentials' },
   { to: '/notes', label: 'Library' },
   { to: '/services', label: 'Services' },
   { to: '/gigs', label: 'Gigs' },
-  { to: '/sell', label: 'Sell' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' }
+  { to: '/sell', label: 'Sell', auth: true },
 ];
 
 const easeOut = [0.16, 1, 0.3, 1];
@@ -68,6 +66,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const visibleNavLinks = navLinks.filter((link) => !link.auth || user);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -191,7 +190,7 @@ export default function Navbar() {
           animate="show"
           className="hidden lg:flex items-center gap-0.5 flex-1 min-w-0"
         >
-          {navLinks.map((l) => {
+          {visibleNavLinks.map((l) => {
             const active = isActive(l.to);
             return (
               <motion.div key={l.to} variants={itemVariants}>
@@ -306,7 +305,7 @@ export default function Navbar() {
           {[
             { to: '/wishlist', icon: HiOutlineHeart, label: 'Wishlist' },
             { to: '/chat', icon: HiOutlineChatBubbleLeftRight, label: 'Messages' }
-          ].map(({ to, icon: Icon, label }) => (
+          ].filter(() => Boolean(user)).map(({ to, icon: Icon, label }) => (
             <motion.div key={to} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Link to={to} aria-label={label} className={`hidden sm:inline-flex ${iconButtonClass}`}>
                 <Icon className="h-5 w-5" />
@@ -316,7 +315,7 @@ export default function Navbar() {
 
           {/* Notifications — separate from the map above so it can carry the unread badge */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Link to="/notifications" aria-label="Notifications" className={`hidden sm:inline-flex relative ${iconButtonClass}`}>
+            {user && <Link to="/notifications" aria-label="Notifications" className={`hidden sm:inline-flex relative ${iconButtonClass}`}>
               <HiOutlineBell className="h-5 w-5" />
               {unreadCount > 0 && (
                 <motion.span
@@ -327,7 +326,7 @@ export default function Navbar() {
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>
               )}
-            </Link>
+            </Link>}
           </motion.div>
 
           {/* Divider before profile/login */}
@@ -468,12 +467,8 @@ export default function Navbar() {
                 className="flex flex-col gap-1 p-4 flex-1"
               >
                 {[
-                  ...navLinks,
-                  { to: '/wishlist', label: 'Wishlist' },
-                  { to: '/chat', label: 'Chat' },
-                  { to: '/notifications', label: unreadCount > 0 ? `Notifications (${unreadCount})` : 'Notifications' },
-                  { to: '/dashboard', label: 'Dashboard' },
-                  ...(user ? [{ to: '/profile', label: 'Profile' }, { to: '/orders', label: 'Orders' }] : []),
+                  ...visibleNavLinks,
+                  ...(user ? [{ to: '/wishlist', label: 'Wishlist' }, { to: '/chat', label: 'Chat' }, { to: '/notifications', label: unreadCount > 0 ? `Notifications (${unreadCount})` : 'Notifications' }, { to: '/dashboard', label: 'Dashboard' }, { to: '/profile', label: 'Profile' }, { to: '/orders', label: 'Orders' }] : []),
                   ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
                 ].map((item, i) => (
                   <motion.div key={item.to} variants={itemVariants}>

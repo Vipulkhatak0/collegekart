@@ -14,29 +14,27 @@ export default function ProductCard({ product, onToggleWishlist, isWishlisted })
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35 }}
-      className="id-notch glass-card group overflow-hidden"
+      className="glass-card group overflow-hidden"
     >
       <Link to={`/product/${product._id}`}>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-t-card">
-          <img src={product.images?.[0]} alt={product.title} className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.status && product.status !== 'active' ? 'grayscale opacity-70' : ''}`} />
+        <div className="relative aspect-[4/3] overflow-hidden bg-[#F6F7F9]">
+          {product.images?.[0] ? <img src={product.images[0]} alt={product.title} loading="lazy" className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] ${product.status && product.status !== 'active' ? 'grayscale opacity-70' : ''}`} /> : <div className="grid h-full place-items-center text-sm text-slate-400">No image available</div>}
           {product.status && product.status !== 'active' && (
             <span className="absolute left-3 top-3 rounded-full bg-slate-900/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sold</span>
           )}
-          {product.isFeatured && product.status === 'active' && (
-            <span className="absolute left-3 top-3 rounded-full bg-brand-gradient px-2.5 py-1 text-[10px] font-semibold text-white shadow">Featured</span>
-          )}
-          <button
+          {onToggleWishlist && <button
             onClick={(e) => { e.preventDefault(); onToggleWishlist?.(product._id); }}
             aria-label="Save to wishlist"
             className={`absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/80 dark:bg-black/50 backdrop-blur transition-colors ${isWishlisted ? 'text-red-500' : 'text-slate-600 dark:text-white hover:text-red-500'}`}
           >
             <HiOutlineHeart className="h-4 w-4" fill={isWishlisted ? 'currentColor' : 'none'} />
-          </button>
+          </button>}
         </div>
 
         <div className="p-4">
           <h3 className="line-clamp-1 font-display text-sm font-semibold text-slate-800 dark:text-white">{product.title}</h3>
 
+          <p className="mt-1 text-xs text-slate-500">{product.category}{product.condition ? ` · ${product.condition}` : ''}</p>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="font-display text-lg font-bold text-primary-600 dark:text-primary-400">₹{product.price?.toLocaleString()}</span>
             {hasDiscount && (
